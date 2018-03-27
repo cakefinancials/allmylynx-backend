@@ -1,0 +1,41 @@
+service: cake-financials-app-api
+
+# Use serverless-webpack plugin to transpile ES6/ES7
+plugins:
+  - serverless-webpack
+
+# Configuration for serverless-webpack
+# Enable auto-packing of external modules
+custom:
+  myStage: ${opt:stage, self:provider.stage}
+  webpack:
+    webpackConfig: ./webpack.config.js
+    includeModules: true
+
+provider:
+  name: aws
+  runtime: nodejs6.10
+  stage: prod
+  region: us-east-2
+  environment:
+    MY_STAGE: ${self:custom.myStage}
+
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - s3:*
+      Resource: "arn:aws:s3:::cake-financials-user-data/*"
+
+functions:
+  # Defines an HTTP API endpoint that calls the main function in save_broker_credentials.js
+  save_broker_credentials:
+    handler: save_broker_credentials.main
+    environment:
+      USER_DATA_PUBLIC_KEY: ${s3:cake-financials-config/USER_DATA_PUBLIC_KEY}
+      USER_DATA_BUCKET: ${s3:cake-financials-config/USER_DATA_BUCKET}
+    events:
+      - http:
+          path: broke/credentials
+          method: post
+          cors: true
+          authorizer: aws_iam
