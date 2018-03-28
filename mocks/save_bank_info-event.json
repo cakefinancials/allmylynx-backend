@@ -1,0 +1,8 @@
+{
+    "body": "{\"routingNumber\":\"1234\",\"accountNumber\":\"4321\"}",
+    "requestContext": {
+        "identity": {
+            "cognitoIdentityId": "USER-SUB-1234"
+        }
+    }
+}

@@ -27,7 +27,6 @@ provider:
       Resource: "arn:aws:s3:::cake-financials-user-data/*"
 
 functions:
-  # Defines an HTTP API endpoint that calls the main function in save_broker_credentials.js
   save_broker_credentials:
     handler: save_broker_credentials.main
     environment:
@@ -35,7 +34,41 @@ functions:
       USER_DATA_BUCKET: ${s3:cake-financials-config/USER_DATA_BUCKET}
     events:
       - http:
-          path: broke/credentials
+          path: broker/credentials
           method: post
+          cors: true
+          authorizer: aws_iam
+
+  head_broker_credentials:
+    handler: head_broker_credentials.main
+    environment:
+      USER_DATA_BUCKET: ${s3:cake-financials-config/USER_DATA_BUCKET}
+    events:
+      - http:
+          path: broker/credentials
+          method: get
+          cors: true
+          authorizer: aws_iam
+
+  save_bank_info:
+    handler: save_bank_info.main
+    environment:
+      USER_DATA_PUBLIC_KEY: ${s3:cake-financials-config/USER_DATA_PUBLIC_KEY}
+      USER_DATA_BUCKET: ${s3:cake-financials-config/USER_DATA_BUCKET}
+    events:
+      - http:
+          path: bank/account_info
+          method: post
+          cors: true
+          authorizer: aws_iam
+
+  head_bank_info:
+    handler: head_bank_info.main
+    environment:
+      USER_DATA_BUCKET: ${s3:cake-financials-config/USER_DATA_BUCKET}
+    events:
+      - http:
+          path: bank/account_info
+          method: get
           cors: true
           authorizer: aws_iam

@@ -13,3 +13,12 @@ export function s3PutObject(bucket, key, body) {
 
     return s3.putObject(params).promise();
 }
+
+export function s3HeadObject(bucket, key) {
+    const params = {
+        Bucket: bucket,
+        Key: key
+    };
+
+    return s3.headObject(params).promise();
+}

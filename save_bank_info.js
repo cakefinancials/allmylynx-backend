@@ -9,13 +9,12 @@ export async function main(event, context, callback) {
     const data = JSON.parse(event.body);
 
     const userId = event.requestContext.identity.cognitoIdentityId;
-    const objectKey = `${userId}/broker_credentials`
+    const objectKey = `${userId}/bank_info`
 
     try {
         const s3ObjectRawBody = JSON.stringify({
-            username: data.username,
-            password: data.password,
-            brokerage: data.brokerage,
+            routingNumber: data.routingNumber,
+            accountNumber: data.accountNumber,
         });
 
         const encryptedS3Object = await encryptText(s3ObjectRawBody);
@@ -30,6 +29,6 @@ export async function main(event, context, callback) {
     } catch (e) {
         // log out errors so we can view them in cloudwatch logs
         console.log(e);
-        callback(null, failure({ error: 'Error while saving brokerage credential data' }));
+        callback(null, failure({ error: 'Error while saving bank info data' }));
     }
 }
