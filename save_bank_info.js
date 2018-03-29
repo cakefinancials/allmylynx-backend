@@ -12,6 +12,8 @@ export async function main(event, context, callback) {
     const objectKey = `${userId}/bank_info`
 
     try {
+        console.log(`Encrypting and uploading ${objectKey}`);
+
         const s3ObjectRawBody = JSON.stringify({
             routingNumber: data.routingNumber,
             accountNumber: data.accountNumber,

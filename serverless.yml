@@ -25,6 +25,10 @@ provider:
       Action:
         - s3:*
       Resource: "arn:aws:s3:::cake-financials-user-data/*"
+    - Effect: Allow
+      Action:
+        - s3:*
+      Resource: "arn:aws:s3:::cake-financials-user-data"
 
 functions:
   save_broker_credentials:

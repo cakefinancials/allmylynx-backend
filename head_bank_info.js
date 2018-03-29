@@ -8,6 +8,8 @@ export async function main(event, context, callback) {
     const objectKey = `${userId}/bank_info`
 
     try {
+        console.log(`Querying for ${objectKey}`);
+
         const response = await s3HeadObject(
             process.env.USER_DATA_BUCKET,
             objectKey
