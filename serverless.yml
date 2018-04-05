@@ -43,13 +43,24 @@ functions:
           cors: true
           authorizer: aws_iam
 
-  head_brokerage_credentials:
-    handler: head_brokerage_credentials.main
+  get_brokerage_credentials_exists:
+    handler: get_brokerage_credentials_exists.main
     environment:
       USER_DATA_BUCKET: ${s3:cake-financials-config/USER_DATA_BUCKET}
     events:
       - http:
-          path: brokerage/credentials
+          path: brokerage/credentials/exists
+          method: get
+          cors: true
+          authorizer: aws_iam
+
+  get_obfuscated_brokerage_credentials:
+    handler: get_obfuscated_brokerage_credentials.main
+    environment:
+      USER_DATA_BUCKET: ${s3:cake-financials-config/USER_DATA_BUCKET}
+    events:
+      - http:
+          path: brokerage/credentials/obfuscated
           method: get
           cors: true
           authorizer: aws_iam
@@ -66,13 +77,24 @@ functions:
           cors: true
           authorizer: aws_iam
 
-  head_bank_info:
-    handler: head_bank_info.main
+  get_bank_info_exists:
+    handler: get_bank_info_exists.main
     environment:
       USER_DATA_BUCKET: ${s3:cake-financials-config/USER_DATA_BUCKET}
     events:
       - http:
-          path: bank/account_info
+          path: bank/account_info/exists
+          method: get
+          cors: true
+          authorizer: aws_iam
+
+  get_obfuscated_bank_info:
+    handler: get_obfuscated_bank_info.main
+    environment:
+      USER_DATA_BUCKET: ${s3:cake-financials-config/USER_DATA_BUCKET}
+    events:
+      - http:
+          path: bank/account_info/obfuscated
           method: get
           cors: true
           authorizer: aws_iam

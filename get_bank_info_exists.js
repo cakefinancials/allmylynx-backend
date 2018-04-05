@@ -1,5 +1,3 @@
-import AWS from "aws-sdk";
-
 import { success, failure } from "./libs/response-lib";
 import { s3HeadObject } from "./libs/aws-lib";
 

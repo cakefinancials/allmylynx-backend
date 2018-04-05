@@ -22,3 +22,12 @@ export function s3HeadObject(bucket, key) {
 
     return s3.headObject(params).promise();
 }
+
+export function s3GetObject(bucket, key) {
+    const params = {
+        Bucket: bucket,
+        Key: key
+    };
+
+    return s3.getObject(params).promise();
+}
