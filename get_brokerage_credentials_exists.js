@@ -3,7 +3,7 @@ import { s3HeadObject } from "./libs/aws-lib";
 
 export async function main(event, context, callback) {
     const userId = event.requestContext.identity.cognitoIdentityId;
-    const objectKey = `${userId}/broker_credentials`
+    const objectKey = `${userId}/brokerage_credentials`
 
     try {
         console.log(`Querying for ${objectKey}`);
