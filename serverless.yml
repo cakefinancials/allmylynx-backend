@@ -29,8 +29,24 @@ provider:
       Action:
         - s3:*
       Resource: "arn:aws:s3:::cake-financials-user-data"
+    - Effect: Allow
+      Action:
+        - cognito-idp:ListUsers
+      Resource: "arn:aws:cognito-idp:us-east-2:951721516169:userpool/us-east-2_9v5RltuvI"
 
 functions:
+  save_user_email_identity_link:
+    handler: save_user_email_identity_link.main
+    environment:
+      CAKE_USER_POOL_ID: ${s3:cake-financials-config/CAKE_USER_POOL_ID}
+      USER_DATA_BUCKET: ${s3:cake-financials-config/USER_DATA_BUCKET}
+    events:
+      - http:
+          path: link_email_to_id
+          method: post
+          cors: true
+          authorizer: aws_iam
+
   save_brokerage_creds:
     handler: save_brokerage_credentials.main
     environment:

@@ -31,3 +31,15 @@ export function s3GetObject(bucket, key) {
 
     return s3.getObject(params).promise();
 }
+
+export function dynamoDBCall(action, params) {
+    const dynamoDb = new AWS.DynamoDB.DocumentClient();
+
+    return dynamoDb[action](params).promise();
+}
+
+export function cognitoIdentityServiceProviderCall(action, params) {
+    const client = new AWS.CognitoIdentityServiceProvider();
+
+    return client[action](params).promise();
+}
