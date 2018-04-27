@@ -1,5 +1,5 @@
 import { success, failure } from "./libs/response-lib";
-import { s3PutObject, cognitoIdentityServiceProviderCall } from "./libs/aws-lib";
+import * as awsLib from "./libs/aws-lib";
 import { executeAllPromises } from "./libs/helper-lib";
 
 export async function main(event, context, callback) {
@@ -25,7 +25,7 @@ export async function main(event, context, callback) {
 
     let email;
     try {
-        const response = await cognitoIdentityServiceProviderCall('listUsers', idpParams);
+        const response = await awsLib.cognitoIdentityServiceProviderCall('listUsers', idpParams);
         const users = response['Users'];
         if (users.length === 0) {
             console.log('Could not find any matching users');
@@ -44,7 +44,7 @@ export async function main(event, context, callback) {
 
     const userEmailIdentityLink = `email_to_cognito_id/${email}/${cognitoId}`;
 
-    const createLinkPromise = s3PutObject(
+    const createLinkPromise = awsLib.s3PutObject(
         process.env.USER_DATA_BUCKET,
         userEmailIdentityLink,
         ''

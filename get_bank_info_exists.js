@@ -1,5 +1,9 @@
 import { success, failure } from "./libs/response-lib";
-import { s3HeadObject } from "./libs/aws-lib";
+import * as awsLib from "./libs/aws-lib";
+
+export const CONSTANTS = {
+    FAILURE_MESSAGE: "Error while fetching bank account object"
+};
 
 export async function main(event, context, callback) {
     const userId = event.requestContext.identity.cognitoIdentityId;
@@ -8,7 +12,7 @@ export async function main(event, context, callback) {
     try {
         console.log(`Querying for ${objectKey}`);
 
-        const response = await s3HeadObject(
+        const response = await awsLib.s3HeadObject(
             process.env.USER_DATA_BUCKET,
             objectKey
         );
@@ -19,7 +23,7 @@ export async function main(event, context, callback) {
             callback(null, success({ exists: false }));
         } else {
             console.log(e);
-            callback(null, failure({ error: 'Error while fetching bank account object' }));
+            callback(null, failure({ error: CONSTANTS.FAILURE_MESSAGE }));
         }
     }
 }

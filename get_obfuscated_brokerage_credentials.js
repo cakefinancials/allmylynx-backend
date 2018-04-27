@@ -1,12 +1,12 @@
 import { success, failure } from "./libs/response-lib";
-import { s3GetObject } from "./libs/aws-lib";
+import * as awsLib from "./libs/aws-lib";
 
 export async function main(event, context, callback) {
     const userId = event.requestContext.identity.cognitoIdentityId;
     const objectKey = `${userId}/obfuscated_brokerage_credentials.json`
 
     try {
-        const response = await s3GetObject(
+        const response = await awsLib.s3GetObject(
             process.env.USER_DATA_BUCKET,
             objectKey
         );

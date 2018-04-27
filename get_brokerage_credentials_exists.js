@@ -1,5 +1,5 @@
 import { success, failure } from "./libs/response-lib";
-import { s3HeadObject } from "./libs/aws-lib";
+import * as awsLib from "./libs/aws-lib";
 
 export async function main(event, context, callback) {
     const userId = event.requestContext.identity.cognitoIdentityId;
@@ -8,7 +8,7 @@ export async function main(event, context, callback) {
     try {
         console.log(`Querying for ${objectKey}`);
 
-        const response = await s3HeadObject(
+        const response = await awsLib.s3HeadObject(
             process.env.USER_DATA_BUCKET,
             objectKey
         );

@@ -1,7 +1,7 @@
 import Promise from "bluebird";
 
 import { success, failure } from "./libs/response-lib";
-import { s3PutObject } from "./libs/aws-lib";
+import * as awsLib from "./libs/aws-lib";
 import { encryptText } from "./libs/pgp-lib";
 import { obfuscate, executeAllPromises } from "./libs/helper-lib";
 
@@ -27,7 +27,7 @@ export async function main(event, context, callback) {
         return;
     }
 
-    const encryptedS3UploadPromise = s3PutObject(
+    const encryptedS3UploadPromise = awsLib.s3PutObject(
         process.env.USER_DATA_BUCKET,
         encryptedBrokerCredentialsKey,
         encryptedS3Object
@@ -39,7 +39,7 @@ export async function main(event, context, callback) {
         brokerage: data.brokerage,
     });
 
-    const obfuscatedS3UploadPromise = s3PutObject(
+    const obfuscatedS3UploadPromise = awsLib.s3PutObject(
         process.env.USER_DATA_BUCKET,
         obfuscatedBrokerageCredentials,
         obfuscatedS3Object
