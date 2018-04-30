@@ -4,8 +4,8 @@ import Promise from "bluebird";
 
 import { main, CONSTANTS } from "../get_bank_info_exists";
 import { getDefaultEvent, getDefaultContext } from "./helpers/defaults";
-import * as awsLib from "../libs/aws-lib";
-import { success, failure } from "../libs/response-lib";
+import * as awsLib from "../libs/aws";
+import { success, failure } from "../libs/response";
 
 describe("get_bank_info_exists", () => {
     const mainPromise = Promise.promisify(main);

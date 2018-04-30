@@ -34,6 +34,7 @@
   "dependencies": {
     "babel-runtime": "^6.26.0",
     "bluebird": "^3.5.1",
+    "bottlejs": "^1.7.0",
     "openpgp": "^3.0.3"
   }
 }

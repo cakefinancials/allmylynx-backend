@@ -1,6 +1,6 @@
-import { success, failure } from "./libs/response-lib";
-import * as awsLib from "./libs/aws-lib";
-import { executeAllPromises } from "./libs/helper-lib";
+import { success, failure } from "./libs/response";
+import * as awsLib from "./libs/aws";
+import { executeAllPromises } from "./libs/helper";
 
 export async function main(event, context, callback) {
     const userPoolId = process.env.CAKE_USER_POOL_ID;

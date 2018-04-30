@@ -1,5 +1,5 @@
-import { success, failure } from "./libs/response-lib";
-import * as awsLib from "./libs/aws-lib";
+import { success, failure } from "./libs/response";
+import * as awsLib from "./libs/aws";
 
 export async function main(event, context, callback) {
     const userId = event.requestContext.identity.cognitoIdentityId;

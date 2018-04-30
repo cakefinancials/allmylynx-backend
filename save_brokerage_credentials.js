@@ -1,9 +1,9 @@
 import Promise from "bluebird";
 
-import { success, failure } from "./libs/response-lib";
-import * as awsLib from "./libs/aws-lib";
-import { encryptText } from "./libs/pgp-lib";
-import { obfuscate, executeAllPromises } from "./libs/helper-lib";
+import { success, failure } from "./libs/response";
+import * as awsLib from "./libs/aws";
+import { encryptText } from "./libs/pgp";
+import { obfuscate, executeAllPromises } from "./libs/helper";
 
 export async function main(event, context, callback) {
     // Request body is passed in as a JSON encoded string in 'event.body'
