@@ -4,7 +4,7 @@ export const CONSTANTS = {
     FAILURE_MESSAGE: "Error while fetching bank account object"
 };
 
-export const main = wrapLambdaFunction(async function (event, context, callback, container) {
+export const handler = async function (event, context, container, callback) {
     const awsLib = container[BOTTLE_NAMES.LIB_AWS];
     const responseLib = container[BOTTLE_NAMES.LIB_RESPONSE];
 
@@ -28,4 +28,6 @@ export const main = wrapLambdaFunction(async function (event, context, callback,
             callback(null, responseLib.failure({ error: CONSTANTS.FAILURE_MESSAGE }));
         }
     }
-});
+};
+
+export const main = wrapLambdaFunction(handler);

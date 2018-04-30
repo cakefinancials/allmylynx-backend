@@ -2,6 +2,7 @@
  * Place all of our dependencies in a bottle
  */
 import Bottle from "bottlejs";
+import R from "ramda";
 
 /* all of the node module dependencies */
 import AWS from "aws-sdk";
@@ -26,25 +27,27 @@ export const BOTTLE_NAMES = {
     LIB_RESPONSE: "lib|response",
 };
 
-export function buildBottle() {
+export function buildBottle(overrides = {}) {
     const bottle = new Bottle();
 
-    bottle.service(BOTTLE_NAMES.EXTERN_AWS_SDK, () => AWS);
-    bottle.service(BOTTLE_NAMES.EXTERN_BLUEBIRD, () => Promise);
-    bottle.service(BOTTLE_NAMES.EXTERN_OPENPGP, () => openpgp);
+    const factories = R.merge({
+        [BOTTLE_NAMES.EXTERN_AWS_SDK]: () => AWS,
+        [BOTTLE_NAMES.EXTERN_BLUEBIRD]: () => Promise,
+        [BOTTLE_NAMES.EXTERN_OPENPGP]: () => openpgp,
+        [BOTTLE_NAMES.LIB_AWS]: awsLibBottleFactory,
+        [BOTTLE_NAMES.LIB_HELPER]: helperLibBottleFactory,
+        [BOTTLE_NAMES.LIB_PGP]: pgpLibBottleFactory,
+        [BOTTLE_NAMES.LIB_RESPONSE]: responseLibBottleFactory,
+    }, overrides);
 
-    bottle.factory(BOTTLE_NAMES.LIB_AWS, awsLibBottleFactory);
-    bottle.factory(BOTTLE_NAMES.LIB_HELPER, helperLibBottleFactory);
-    bottle.factory(BOTTLE_NAMES.LIB_PGP, pgpLibBottleFactory);
-    bottle.factory(BOTTLE_NAMES.LIB_RESPONSE, responseLibBottleFactory);
+    R.forEachObjIndexed((factory, name) => bottle.factory(name, factory), factories);
 
     return bottle;
 }
 
 export function wrapLambdaFunction(lambdaFn) {
-    const bottle = buildBottle();
-
     return (event, content, callback) => {
-        return lambdaFn(event, content, callback, bottle.container);
+        const bottle = buildBottle();
+        return lambdaFn(event, content, bottle.container, callback);
     };
 };
