@@ -9,7 +9,7 @@ export const handler = async function (event, context, container, callback) {
     const responseLib = container[BOTTLE_NAMES.LIB_RESPONSE];
 
     const userId = event.requestContext.identity.cognitoIdentityId;
-    const objectKey = `${userId}/bank_info`
+    const objectKey = `${userId}/bank_info`;
 
     try {
         console.log(`Querying for ${objectKey}`);

@@ -1,7 +1,13 @@
-import { success, failure } from "./libs/response";
-import * as awsLib from "./libs/aws";
+import { BOTTLE_NAMES, wrapLambdaFunction } from "./libs/bottle";
 
-export async function main(event, context, callback) {
+export const CONSTANTS = {
+    FAILURE_MESSAGE: "Error while fetching brokerage credentials object"
+};
+
+export const handler = async function (event, context, container, callback) {
+    const awsLib = container[BOTTLE_NAMES.LIB_AWS];
+    const responseLib = container[BOTTLE_NAMES.LIB_RESPONSE];
+
     const userId = event.requestContext.identity.cognitoIdentityId;
     const objectKey = `${userId}/brokerage_credentials`
 
@@ -13,13 +19,15 @@ export async function main(event, context, callback) {
             objectKey
         );
 
-        callback(null, success({ exists: true }));
+        callback(null, responseLib.success({ exists: true }));
     } catch (e) {
         if (e.code === 'NotFound') {
-            callback(null, success({ exists: false }));
+            callback(null, responseLib.success({ exists: false }));
         } else {
             console.log(e);
-            callback(null, failure({ error: 'Error while fetching brokerage credentials object' }));
+            callback(null, responseLib.failure({ error: CONSTANTS.FAILURE_MESSAGE }));
         }
     }
 }
+
+export const main = wrapLambdaFunction(handler);
