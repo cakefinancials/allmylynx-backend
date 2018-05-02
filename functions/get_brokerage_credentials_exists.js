@@ -1,4 +1,4 @@
-import { BOTTLE_NAMES, wrapLambdaFunction } from "./libs/bottle";
+import { BOTTLE_NAMES, wrapLambdaFunction } from "../libs/bottle";
 
 export const CONSTANTS = {
     FAILURE_MESSAGE: "Error while fetching brokerage credentials object"

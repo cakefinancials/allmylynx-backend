@@ -1,10 +1,10 @@
-import { BOTTLE_NAMES, wrapLambdaFunction } from "./libs/bottle";
+import { BOTTLE_NAMES, wrapLambdaFunction } from "../libs/bottle";
 
 export const CONSTANTS = {
     FAILURE_MESSAGE: "Error while fetching bank account object"
 };
 
-export const handler = async function (event, context, container, callback) {
+export const bottledHandler = async function (event, context, container, callback) {
     const awsLib = container[BOTTLE_NAMES.LIB_AWS];
     const responseLib = container[BOTTLE_NAMES.LIB_RESPONSE];
 
@@ -30,4 +30,4 @@ export const handler = async function (event, context, container, callback) {
     }
 };
 
-export const main = wrapLambdaFunction(handler);
+export const main = wrapLambdaFunction(bottledHandler);

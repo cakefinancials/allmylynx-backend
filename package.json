@@ -4,7 +4,8 @@
   "description": "",
   "main": "handler.js",
   "scripts": {
-    "test": "./node_modules/.bin/mocha --require babel-core/register --reporter spec"
+    "test": "./node_modules/.bin/mocha --require babel-core/register --reporter spec",
+    "test_local_mocks": "node test/scripts/run_mocks.js"
   },
   "repository": {
     "type": "git",

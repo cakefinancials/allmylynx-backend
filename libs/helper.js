@@ -59,5 +59,5 @@ export function BOTTLE_FACTORY(container) {
         },
     };
 
-    return service;
+    return SERVICE;
 }

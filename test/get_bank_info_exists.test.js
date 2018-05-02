@@ -2,7 +2,7 @@ import { expect } from "chai";
 import simple from "simple-mock";
 import Promise from "bluebird";
 
-import { handler, CONSTANTS } from "../get_bank_info_exists";
+import { handler, CONSTANTS } from "../functions/get_bank_info_exists";
 import { getDefaultEvent, getDefaultContext } from "./helpers/defaults";
 
 import { BOTTLE_NAMES, buildBottle } from "../libs/bottle";

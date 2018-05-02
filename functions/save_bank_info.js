@@ -1,0 +1,68 @@
+import Promise from "bluebird";
+
+import { BOTTLE_NAMES, wrapLambdaFunction } from "../libs/bottle";
+
+export const CONSTANTS = {
+    ENCRYPTING_DATA_FAILURE_MESSAGE: "Error while encrypting data",
+    S3_UPLOAD_FAILURE_MESSAGE: "Errors while saving bank info data"
+};
+
+export const handler = async function (event, context, container, callback) {
+    const awsLib = container[BOTTLE_NAMES.LIB_AWS];
+    const responseLib = container[BOTTLE_NAMES.LIB_RESPONSE];
+    const pgpLib = container[BOTTLE_NAMES.LIB_PGP];
+    const helperLib = container[BOTTLE_NAMES.LIB_HELPER];
+
+    // Request body is passed in as a JSON encoded string in 'event.body'
+    const data = JSON.parse(event.body);
+
+    const userId = event.requestContext.identity.cognitoIdentityId;
+
+    const encryptedBankInfoKey = `${userId}/bank_info`;
+
+    const s3ObjectRawBody = JSON.stringify({
+        routingNumber: data.routingNumber,
+        accountNumber: data.accountNumber,
+    });
+
+    let encryptedS3Object;
+    try {
+        encryptedS3Object = await pgpLib.encryptText(s3ObjectRawBody);
+    } catch (e) {
+        console.log(CONSTANTS.ENCRYPTING_DATA_FAILURE_MESSAGE, e);
+        callback(null, responseLib.failure({ error: CONSTANTS.ENCRYPTING_DATA_FAILURE_MESSAGE }));
+        return;
+    }
+
+    const encryptedS3UploadPromise = awsLib.s3PutObject(
+        process.env.USER_DATA_BUCKET,
+        encryptedBankInfoKey,
+        encryptedS3Object
+    );
+
+    const obfuscatedBankInfoKey = `${userId}/obfuscated_bank_info.json`;
+    const obfuscatedS3Object = JSON.stringify({
+        routingNumber: helperLib.obfuscate(data.routingNumber, 4),
+        accountNumber: helperLib.obfuscate(data.accountNumber, 4),
+    });
+
+    const obfuscatedS3UploadPromise = awsLib.s3PutObject(
+        process.env.USER_DATA_BUCKET,
+        obfuscatedBankInfoKey,
+        obfuscatedS3Object
+    );
+
+    const results = await helperLib.executeAllPromises([
+        encryptedS3UploadPromise,
+        obfuscatedS3UploadPromise
+    ]);
+
+    if (results.errors.length > 0) {
+        console.log(CONSTANTS.S3_UPLOAD_FAILURE_MESSAGE, {errors: results.errors});
+        callback(null, responseLib.failure({ error: CONSTANTS.S3_UPLOAD_FAILURE_MESSAGE }));
+    } else {
+        callback(null, responseLib.success({ success: true }));
+    }
+}
+
+export const main = wrapLambdaFunction(handler);
