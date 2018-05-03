@@ -6,6 +6,7 @@ export const CONSTANTS = {
 
 export const handler = async function (event, context, container, callback) {
     const awsLib = container[BOTTLE_NAMES.LIB_AWS];
+    const envLib = container[BOTTLE_NAMES.LIB_ENV];
     const responseLib = container[BOTTLE_NAMES.LIB_RESPONSE];
 
     const userId = event.requestContext.identity.cognitoIdentityId;
@@ -15,7 +16,7 @@ export const handler = async function (event, context, container, callback) {
         console.log(`Querying for ${objectKey}`);
 
         const response = await awsLib.s3HeadObject(
-            process.env.USER_DATA_BUCKET,
+            envLib.getEnvVar("USER_DATA_BUCKET"),
             objectKey
         );
 

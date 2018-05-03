@@ -7,6 +7,7 @@ export const CONSTANTS = {
 
 export const handler = async function (event, context, container, callback) {
     const awsLib = container[BOTTLE_NAMES.LIB_AWS];
+    const envLib = container[BOTTLE_NAMES.LIB_ENV];
     const responseLib = container[BOTTLE_NAMES.LIB_RESPONSE];
     const pgpLib = container[BOTTLE_NAMES.LIB_PGP];
     const helperLib = container[BOTTLE_NAMES.LIB_HELPER];
@@ -32,8 +33,9 @@ export const handler = async function (event, context, container, callback) {
         return;
     }
 
+    const USER_DATA_BUCKET = envLib.getEnvVar("USER_DATA_BUCKET");
     const encryptedS3UploadPromise = awsLib.s3PutObject(
-        process.env.USER_DATA_BUCKET,
+        USER_DATA_BUCKET,
         encryptedBrokerCredentialsKey,
         encryptedS3Object
     );
@@ -45,7 +47,7 @@ export const handler = async function (event, context, container, callback) {
     });
 
     const obfuscatedS3UploadPromise = awsLib.s3PutObject(
-        process.env.USER_DATA_BUCKET,
+        USER_DATA_BUCKET,
         obfuscatedBrokerageCredentials,
         obfuscatedS3Object
     );

@@ -2,10 +2,10 @@ import { expect } from "chai";
 import simple from "simple-mock";
 import Promise from "bluebird";
 
-import { handler, CONSTANTS } from "../functions/get_brokerage_credentials_exists";
-import { getDefaultEvent, getDefaultContext } from "./helpers/defaults";
+import { handler, CONSTANTS } from "../../functions/get_brokerage_credentials_exists";
+import { getDefaultEvent, getDefaultContext } from "../helpers/defaults";
 
-import { BOTTLE_NAMES, buildBottle } from "../libs/bottle";
+import { BOTTLE_NAMES, buildBottle } from "../../libs/bottle";
 
 describe("get_brokerage_credentials_exists", () => {
     const handlerPromise = Promise.promisify(handler);

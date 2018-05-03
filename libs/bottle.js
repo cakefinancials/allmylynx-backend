@@ -12,6 +12,7 @@ const openpgp = require('openpgp');
 
 /* all of the local dependencies */
 import { BOTTLE_FACTORY as awsLibBottleFactory } from "./aws";
+import { BOTTLE_FACTORY as envLibBottleFactory } from "./env";
 import { BOTTLE_FACTORY as helperLibBottleFactory } from "./helper";
 import { BOTTLE_FACTORY as pgpLibBottleFactory } from "./pgp";
 import { BOTTLE_FACTORY as responseLibBottleFactory } from "./response";
@@ -22,23 +23,31 @@ export const BOTTLE_NAMES = {
     EXTERN_OPENPGP: "node_modules|openpgp",
 
     LIB_AWS: "lib|aws",
+    LIB_ENV: "lib|env",
     LIB_HELPER: "lib|helper",
     LIB_PGP: "lib|pgp",
     LIB_RESPONSE: "lib|response",
 };
 
+let DEFAULT_BOTTLE_OVERRIDES = {};
+
+export const setDefaultBottleOverrides = (overrides) => {
+    DEFAULT_BOTTLE_OVERRIDES = R.merge(DEFAULT_BOTTLE_OVERRIDES, overrides);
+}
+
 export function buildBottle(overrides = {}) {
     const bottle = new Bottle();
 
-    const factories = R.merge({
+    const factories = R.mergeAll([{
         [BOTTLE_NAMES.EXTERN_AWS_SDK]: () => AWS,
         [BOTTLE_NAMES.EXTERN_BLUEBIRD]: () => Promise,
         [BOTTLE_NAMES.EXTERN_OPENPGP]: () => openpgp,
         [BOTTLE_NAMES.LIB_AWS]: awsLibBottleFactory,
+        [BOTTLE_NAMES.LIB_ENV]: envLibBottleFactory,
         [BOTTLE_NAMES.LIB_HELPER]: helperLibBottleFactory,
         [BOTTLE_NAMES.LIB_PGP]: pgpLibBottleFactory,
         [BOTTLE_NAMES.LIB_RESPONSE]: responseLibBottleFactory,
-    }, overrides);
+    }, DEFAULT_BOTTLE_OVERRIDES, overrides]);
 
     R.forEachObjIndexed((factory, name) => bottle.factory(name, factory), factories);
 

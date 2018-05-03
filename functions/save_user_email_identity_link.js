@@ -9,12 +9,13 @@ export const CONSTANTS = {
 
 export const handler = async function (event, context, container, callback) {
     const awsLib = container[BOTTLE_NAMES.LIB_AWS];
+    const envLib = container[BOTTLE_NAMES.LIB_ENV];
     const responseLib = container[BOTTLE_NAMES.LIB_RESPONSE];
     const helperLib = container[BOTTLE_NAMES.LIB_HELPER];
 
-    const userPoolId = process.env.CAKE_USER_POOL_ID;
+    const CAKE_USER_POOL_ID = envLib.getEnvVar("CAKE_USER_POOL_ID");
     const cognitoAuthenticationProvider = event.requestContext.identity.cognitoAuthenticationProvider;
-    if (!cognitoAuthenticationProvider.includes(userPoolId)) {
+    if (!cognitoAuthenticationProvider.includes(CAKE_USER_POOL_ID)) {
         console.log(CONSTANTS.UNRECOGNIZED_IDENTITY_PROVIDER_FAILURE_MESSAGE);
         console.log(event.requestContext.identity);
         callback(null, responseLib.failure({ reason: CONSTANTS.UNRECOGNIZED_IDENTITY_PROVIDER_FAILURE_MESSAGE}));
@@ -24,7 +25,7 @@ export const handler = async function (event, context, container, callback) {
     const sub = cognitoAuthenticationProvider.split(':').slice(-1).pop();
     const Filter = `sub=\"${sub}\"`;
     const idpParams = {
-        UserPoolId: userPoolId,
+        UserPoolId: CAKE_USER_POOL_ID,
         AttributesToGet: [
             'sub',
             'email'
@@ -53,8 +54,9 @@ export const handler = async function (event, context, container, callback) {
 
     const userEmailIdentityLink = `email_to_cognito_id/${email}/${cognitoId}`;
 
+    const USER_DATA_BUCKET = envLib.getEnvVar("USER_DATA_BUCKET");
     const createLinkPromise = awsLib.s3PutObject(
-        process.env.USER_DATA_BUCKET,
+        USER_DATA_BUCKET,
         userEmailIdentityLink,
         ''
     );
