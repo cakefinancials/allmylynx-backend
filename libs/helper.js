@@ -5,7 +5,7 @@ export function BOTTLE_FACTORY(container) {
 
     const SERVICE = {
         obfuscate: (str, charactersToShow) => {
-            const lastCharacters = str.slice(-1 * charactersToShow);
+            const lastCharacters = charactersToShow <= 0 ? "" : str.slice(-1 * charactersToShow);
 
             const originalStrLength = str.length;
             const firstCharacters = str.substr(0, originalStrLength - charactersToShow);
