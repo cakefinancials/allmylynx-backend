@@ -5,7 +5,7 @@ import Promise from "bluebird";
 import { handler, CONSTANTS } from "../../functions/get_bank_info_exists";
 import { getDefaultEvent, getDefaultContext } from "../helpers/defaults";
 
-import { BOTTLE_NAMES, buildBottle } from "../../libs/bottle";
+import { BOTTLE_NAMES, testBottleBuilderFactory } from "../../libs/bottle";
 
 describe("get_bank_info_exists", () => {
     const handlerPromise = Promise.promisify(handler);
@@ -13,18 +13,17 @@ describe("get_bank_info_exists", () => {
     const defaultContext = getDefaultContext();
 
     let bottle;
+    const buildTestBottle = testBottleBuilderFactory();
 
     describe("when HEAD call returns", () => {
         let success;
 
         before(() => {
-            bottle = buildBottle({
-                [BOTTLE_NAMES.LIB_AWS]: () => ({
+            ({bottle, success} = buildTestBottle({
+                [BOTTLE_NAMES.LIB_AWS]: {
                     s3HeadObject: simple.stub().resolveWith("does not matter")
-                })
-            });
-
-            success = bottle.container[BOTTLE_NAMES.LIB_RESPONSE].success;
+                }
+            }));
         });
 
         it("should succeed with exists true", async () => {
@@ -37,11 +36,11 @@ describe("get_bank_info_exists", () => {
         let success;
 
         before(() => {
-            bottle = buildBottle({
-                [BOTTLE_NAMES.LIB_AWS]: () => ({
+            ({bottle, success} = buildTestBottle({
+                [BOTTLE_NAMES.LIB_AWS]: {
                     s3HeadObject: simple.stub().rejectWith({code: "NotFound"})
-                })
-            });
+                }
+            }));
 
             success = bottle.container[BOTTLE_NAMES.LIB_RESPONSE].success;
         });
@@ -56,11 +55,11 @@ describe("get_bank_info_exists", () => {
         let failure;
 
         before(() => {
-            bottle = buildBottle({
-                [BOTTLE_NAMES.LIB_AWS]: () => ({
+            ({bottle, failure} = buildTestBottle({
+                [BOTTLE_NAMES.LIB_AWS]: {
                     s3HeadObject: simple.stub().rejectWith({code: "Some Random Code"})
-                })
-            });
+                }
+            }));
 
             failure = bottle.container[BOTTLE_NAMES.LIB_RESPONSE].failure;
         });

@@ -29,13 +29,31 @@ export const BOTTLE_NAMES = {
     LIB_RESPONSE: "lib|response",
 };
 
+export const testBottleBuilderFactory = (defaultMocks = {}) => (overrides = {}) => {
+    const bottle = buildBottle(
+        R.pipe(
+            R.mergeDeepRight(defaultMocks),
+            R.mapObjIndexed(value => () => value)
+        )(overrides)
+    );
+
+    const { success, failure } = bottle.container[BOTTLE_NAMES.LIB_RESPONSE];
+
+    return {
+        bottle,
+        success,
+        failure
+    };
+};
+
+
 let DEFAULT_BOTTLE_OVERRIDES = {};
 
 export const setDefaultBottleOverrides = (overrides) => {
     DEFAULT_BOTTLE_OVERRIDES = R.merge(DEFAULT_BOTTLE_OVERRIDES, overrides);
 }
 
-export function buildBottle(overrides = {}) {
+function buildBottle(overrides = {}) {
     const bottle = new Bottle();
 
     const factories = R.mergeAll([{

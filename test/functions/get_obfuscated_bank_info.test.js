@@ -5,7 +5,7 @@ import Promise from "bluebird";
 import { handler, CONSTANTS } from "../../functions/get_obfuscated_bank_info";
 import { getDefaultEvent, getDefaultContext } from "../helpers/defaults";
 
-import { BOTTLE_NAMES, buildBottle } from "../../libs/bottle";
+import { BOTTLE_NAMES, testBottleBuilderFactory } from "../../libs/bottle";
 
 describe("get_obfuscated_bank_info", () => {
     const handlerPromise = Promise.promisify(handler);
@@ -13,21 +13,20 @@ describe("get_obfuscated_bank_info", () => {
     const defaultContext = getDefaultContext();
 
     let bottle;
+    const buildTestBottle = testBottleBuilderFactory();
 
     describe("when s3GetObject call works", () => {
         let success;
         const responseObject = {some: "obfuscated response"};
 
         before(() => {
-            bottle = buildBottle({
-                [BOTTLE_NAMES.LIB_AWS]: () => ({
+            ({bottle, success} = buildTestBottle({
+                [BOTTLE_NAMES.LIB_AWS]: {
                     s3GetObject: simple.stub().resolveWith({
                         Body: JSON.stringify(responseObject)
                     })
-                })
-            });
-
-            success = bottle.container[BOTTLE_NAMES.LIB_RESPONSE].success;
+                }
+            }));
         });
 
         it("should succeed with the correct data returned", async () => {
@@ -40,13 +39,11 @@ describe("get_obfuscated_bank_info", () => {
         let failure;
 
         before(() => {
-            bottle = buildBottle({
-                [BOTTLE_NAMES.LIB_AWS]: () => ({
+            ({bottle, failure} = buildTestBottle({
+                [BOTTLE_NAMES.LIB_AWS]: {
                     s3GetObject: simple.stub().rejectWith("does not matter")
-                })
-            });
-
-            failure = bottle.container[BOTTLE_NAMES.LIB_RESPONSE].failure;
+                }
+            }));
         });
 
         it("should fail", async () => {

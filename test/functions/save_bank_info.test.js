@@ -7,7 +7,7 @@ import { handler, CONSTANTS } from "../../functions/save_bank_info";
 import { getDefaultEvent, getDefaultContext } from "../helpers/defaults";
 import { TEST_ENV_VARS } from "../init";
 
-import { BOTTLE_NAMES, buildBottle } from "../../libs/bottle";
+import { BOTTLE_NAMES, testBottleBuilderFactory } from "../../libs/bottle";
 
 describe("save_bank_info", () => {
     const handlerPromise = Promise.promisify(handler);
@@ -17,29 +17,14 @@ describe("save_bank_info", () => {
 
     const successResolveText = "does not matter";
 
-    const buildTestBottle = (overrides = {}) => {
-        const bottle = buildBottle(
-            R.pipe(
-                R.mergeDeepRight({
-                    [BOTTLE_NAMES.LIB_AWS]: {
-                        s3PutObject: simple.stub().resolveWith(successResolveText)
-                    },
-                    [BOTTLE_NAMES.LIB_PGP]: {
-                        encryptText: simple.stub().resolveWith(successResolveText)
-                    }
-                }),
-                R.mapObjIndexed(value => () => value)
-            )(overrides)
-        );
-
-        const { success, failure } = bottle.container[BOTTLE_NAMES.LIB_RESPONSE];
-
-        return {
-            bottle,
-            success,
-            failure
-        };
-    };
+    const buildTestBottle = testBottleBuilderFactory({
+        [BOTTLE_NAMES.LIB_AWS]: {
+            s3PutObject: simple.stub().resolveWith(successResolveText)
+        },
+        [BOTTLE_NAMES.LIB_PGP]: {
+            encryptText: simple.stub().resolveWith(successResolveText)
+        }
+    });
 
     describe("when pgp encrypt call fails", () => {
         let bottle, failure;
