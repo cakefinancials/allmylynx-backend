@@ -21,7 +21,7 @@ describe("get_obfuscated_bank_info", () => {
         before(() => {
             bottle = buildBottle({
                 [BOTTLE_NAMES.LIB_AWS]: () => ({
-                    "s3GetObject": simple.stub().resolveWith({
+                    s3GetObject: simple.stub().resolveWith({
                         Body: JSON.stringify(responseObject)
                     })
                 })
@@ -42,7 +42,7 @@ describe("get_obfuscated_bank_info", () => {
         before(() => {
             bottle = buildBottle({
                 [BOTTLE_NAMES.LIB_AWS]: () => ({
-                    "s3GetObject": simple.stub().rejectWith("does not matter")
+                    s3GetObject: simple.stub().rejectWith("does not matter")
                 })
             });
 

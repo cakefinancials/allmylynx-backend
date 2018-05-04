@@ -20,7 +20,7 @@ describe("get_bank_info_exists", () => {
         before(() => {
             bottle = buildBottle({
                 [BOTTLE_NAMES.LIB_AWS]: () => ({
-                    "s3HeadObject": simple.stub().resolveWith("does not matter")
+                    s3HeadObject: simple.stub().resolveWith("does not matter")
                 })
             });
 
@@ -39,7 +39,7 @@ describe("get_bank_info_exists", () => {
         before(() => {
             bottle = buildBottle({
                 [BOTTLE_NAMES.LIB_AWS]: () => ({
-                    "s3HeadObject": simple.stub().rejectWith({code: "NotFound"})
+                    s3HeadObject: simple.stub().rejectWith({code: "NotFound"})
                 })
             });
 
@@ -58,7 +58,7 @@ describe("get_bank_info_exists", () => {
         before(() => {
             bottle = buildBottle({
                 [BOTTLE_NAMES.LIB_AWS]: () => ({
-                    "s3HeadObject": simple.stub().rejectWith({code: "Some Random Code"})
+                    s3HeadObject: simple.stub().rejectWith({code: "Some Random Code"})
                 })
             });
 

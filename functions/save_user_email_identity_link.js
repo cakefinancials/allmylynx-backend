@@ -18,35 +18,35 @@ export const handler = async function (event, context, container, callback) {
     if (!cognitoAuthenticationProvider.includes(CAKE_USER_POOL_ID)) {
         console.log(CONSTANTS.UNRECOGNIZED_IDENTITY_PROVIDER_FAILURE_MESSAGE);
         console.log(event.requestContext.identity);
-        callback(null, responseLib.failure({ reason: CONSTANTS.UNRECOGNIZED_IDENTITY_PROVIDER_FAILURE_MESSAGE}));
+        callback(null, responseLib.failure({ error: CONSTANTS.UNRECOGNIZED_IDENTITY_PROVIDER_FAILURE_MESSAGE}));
         return;
     }
 
-    const sub = cognitoAuthenticationProvider.split(':').slice(-1).pop();
+    const sub = cognitoAuthenticationProvider.split(":").slice(-1).pop();
     const Filter = `sub=\"${sub}\"`;
     const idpParams = {
         UserPoolId: CAKE_USER_POOL_ID,
         AttributesToGet: [
-            'sub',
-            'email'
+            "sub",
+            "email"
         ],
         Filter
     };
 
     let email;
     try {
-        const response = await awsLib.cognitoIdentityServiceProviderCall('listUsers', idpParams);
-        const users = response['Users'];
+        const response = await awsLib.cognitoIdentityServiceProviderCall("listUsers", idpParams);
+        const users = response["Users"];
         if (users.length === 0) {
             console.log(CONSTANTS.NO_MATCHING_USERS_FAILURE_MESSAGE);
-            callback(null, responseLib.failure({ reason: CONSTANTS.NO_MATCHING_USERS_FAILURE_MESSAGE }));
+            callback(null, responseLib.failure({ error: CONSTANTS.NO_MATCHING_USERS_FAILURE_MESSAGE }));
             return;
         }
 
-        email = (users[0]['Attributes'].find(({Name}) => Name === 'email'))['Value'];
+        email = (users[0]["Attributes"].find(({Name}) => Name === "email"))["Value"];
     } catch (e) {
         console.log(e);
-        callback(null, responseLib.failure({ reason: CONSTANTS.COGNITO_LIST_USERS_FAILURE_MESSAGE }));
+        callback(null, responseLib.failure({ error: CONSTANTS.COGNITO_LIST_USERS_FAILURE_MESSAGE }));
         return;
     }
 
@@ -58,7 +58,7 @@ export const handler = async function (event, context, container, callback) {
     const createLinkPromise = awsLib.s3PutObject(
         USER_DATA_BUCKET,
         userEmailIdentityLink,
-        ''
+        ""
     );
 
     const results = await helperLib.executeAllPromises([createLinkPromise]);

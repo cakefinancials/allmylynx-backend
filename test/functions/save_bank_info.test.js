@@ -5,6 +5,7 @@ import R from "ramda";
 
 import { handler, CONSTANTS } from "../../functions/save_bank_info";
 import { getDefaultEvent, getDefaultContext } from "../helpers/defaults";
+import { TEST_ENV_VARS } from "../init";
 
 import { BOTTLE_NAMES, buildBottle } from "../../libs/bottle";
 
@@ -16,16 +17,19 @@ describe("save_bank_info", () => {
 
     const successResolveText = "does not matter";
 
-    const buildTestBottle = (overrides) => {
+    const buildTestBottle = (overrides = {}) => {
         const bottle = buildBottle(
-            R.merge({
-                [BOTTLE_NAMES.LIB_AWS]: () => ({
-                    "s3PutObject": simple.stub().resolveWith(successResolveText)
+            R.pipe(
+                R.mergeDeepRight({
+                    [BOTTLE_NAMES.LIB_AWS]: {
+                        s3PutObject: simple.stub().resolveWith(successResolveText)
+                    },
+                    [BOTTLE_NAMES.LIB_PGP]: {
+                        encryptText: simple.stub().resolveWith(successResolveText)
+                    }
                 }),
-                [BOTTLE_NAMES.LIB_PGP]: () => ({
-                    "encryptText": simple.stub().resolveWith(successResolveText)
-                })
-            }, overrides)
+                R.mapObjIndexed(value => () => value)
+            )(overrides)
         );
 
         const { success, failure } = bottle.container[BOTTLE_NAMES.LIB_RESPONSE];
@@ -42,9 +46,9 @@ describe("save_bank_info", () => {
 
         before(() => {
             ({bottle, failure} = buildTestBottle({
-                [BOTTLE_NAMES.LIB_PGP]: () => ({
-                    "encryptText": simple.stub().rejectWith("some error")
-                })
+                [BOTTLE_NAMES.LIB_PGP]: {
+                    encryptText: simple.stub().rejectWith("some error")
+                }
             }));
         });
 
@@ -59,9 +63,9 @@ describe("save_bank_info", () => {
 
         before(() => {
             ({bottle, failure} = buildTestBottle({
-                [BOTTLE_NAMES.LIB_AWS]: () => ({
-                    "s3PutObject": simple.stub().rejectWith("some error")
-                })
+                [BOTTLE_NAMES.LIB_AWS]: {
+                    s3PutObject: simple.stub().rejectWith("some error")
+                }
             }));
         });
 
@@ -85,7 +89,7 @@ describe("save_bank_info", () => {
             const [encryptedUpload, obfuscatedUpload] =
                 bottle.container[BOTTLE_NAMES.LIB_AWS].s3PutObject.calls;
 
-            const USER_DATA_BUCKET = bottle.container[BOTTLE_NAMES.LIB_ENV].getEnvVar("USER_DATA_BUCKET");
+            const USER_DATA_BUCKET = TEST_ENV_VARS.USER_DATA_BUCKET;
 
             expect(encryptedUpload.args).to.deep.equal([
                 USER_DATA_BUCKET,

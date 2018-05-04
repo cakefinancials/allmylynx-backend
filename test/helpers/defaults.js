@@ -1,16 +1,22 @@
 import R from "ramda";
 
 export function getDefaultEvent(overrides = {}) {
-    const {body, cognitoIdentityId} = R.merge({
+    const {
+        body,
+        cognitoIdentityId,
+        cognitoAuthenticationProvider
+    } = R.merge({
         body: {},
-        cognitoIdentityId: "defaultId"
+        cognitoIdentityId: "defaultId",
+        cognitoAuthenticationProvider: "cognitoIds:user-sub",
     }, overrides);
 
     const event = {
         body: JSON.stringify(body),
         requestContext: {
             identity: {
-                cognitoIdentityId
+                cognitoIdentityId,
+                cognitoAuthenticationProvider
             }
         }
     };
