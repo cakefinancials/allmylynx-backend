@@ -2,23 +2,6 @@ import R from "ramda";
 
 import { setDefaultBottleOverrides, BOTTLE_NAMES } from "../libs/bottle";
 
-export const TEST_ENV_VARS = {
-    AWS_REGION: "us-east-2",
-    USER_DATA_BUCKET: "SOME_FAKE_BUCKET",
-    USER_DATA_PUBLIC_KEY: testPublicKey,
-    CAKE_USER_POOL_ID: "SOME_FAKE_USER_POOL_ID",
-};
-
-setDefaultBottleOverrides({
-    [BOTTLE_NAMES.LIB_ENV]: () => ({
-        getEnvVar: (name) => {
-            const envVar = R.path([name], TEST_ENV_VARS);
-
-            return envVar;
-        }
-    })
-});
-
 const testPublicKey = `
 -----BEGIN PGP PUBLIC KEY BLOCK-----
 Version: BCPG C# v1.6.1.0
@@ -38,3 +21,20 @@ edrNlfZx0U2uVhaU7DThvSDCAq7nmFHuFGAigO6uM+b8QPB4M0zxrcvKtWO4jwvU
 =QZhr
 -----END PGP PUBLIC KEY BLOCK-----
 `;
+
+export const TEST_ENV_VARS = {
+    AWS_REGION: "us-east-2",
+    USER_DATA_BUCKET: "SOME_FAKE_BUCKET",
+    USER_DATA_PUBLIC_KEY: testPublicKey,
+    CAKE_USER_POOL_ID: "SOME_FAKE_USER_POOL_ID",
+};
+
+setDefaultBottleOverrides({
+    [BOTTLE_NAMES.LIB_ENV]: () => ({
+        getEnvVar: (name) => {
+            const envVar = R.path([name], TEST_ENV_VARS);
+
+            return envVar;
+        }
+    })
+});
