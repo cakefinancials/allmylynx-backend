@@ -2,11 +2,11 @@
  * Place all of our dependencies in a bottle
  */
 import Bottle from "bottlejs";
-import R from "ramda";
 
 /* all of the node module dependencies */
 import AWS from "aws-sdk";
 import Promise from "bluebird";
+import R from "ramda";
 // for some reason, openpgp.key will be undefined unless we use require syntax
 const openpgp = require('openpgp');
 
@@ -21,6 +21,7 @@ export const BOTTLE_NAMES = {
     EXTERN_AWS_SDK: "node_modules|aws-sdk",
     EXTERN_BLUEBIRD: "node_modules|bluebird",
     EXTERN_OPENPGP: "node_modules|openpgp",
+    EXTERN_RAMDA: "node_modules|ramda",
 
     LIB_AWS: "lib|aws",
     LIB_ENV: "lib|env",
@@ -60,6 +61,7 @@ function buildBottle(overrides = {}) {
         [BOTTLE_NAMES.EXTERN_AWS_SDK]: () => AWS,
         [BOTTLE_NAMES.EXTERN_BLUEBIRD]: () => Promise,
         [BOTTLE_NAMES.EXTERN_OPENPGP]: () => openpgp,
+        [BOTTLE_NAMES.EXTERN_RAMDA]: () => R,
         [BOTTLE_NAMES.LIB_AWS]: awsLibBottleFactory,
         [BOTTLE_NAMES.LIB_ENV]: envLibBottleFactory,
         [BOTTLE_NAMES.LIB_HELPER]: helperLibBottleFactory,
