@@ -4,7 +4,7 @@ export function BOTTLE_FACTORY(container) {
     const AWS = container[BOTTLE_NAMES.EXTERN_AWS_SDK];
     const envLib = container[BOTTLE_NAMES.LIB_ENV];
 
-    AWS.config.update({ region: envLib.getEnvVar("AWS_REGION") });
+    AWS.config.update({ region: envLib.getEnvVar("AWS_SDK_REGION") });
 
     const s3 = new AWS.S3();
 

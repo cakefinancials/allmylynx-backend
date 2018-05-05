@@ -19,7 +19,7 @@ provider:
   region: us-east-2
   environment:
     MY_STAGE: ${self:custom.myStage}
-    AWS_REGION: ${s3:cake-financials-config/AWS_REGION}
+    AWS_SDK_REGION: ${s3:cake-financials-config/AWS_SDK_REGION}
 
   iamRoleStatements:
     - Effect: Allow

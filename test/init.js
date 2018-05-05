@@ -23,7 +23,7 @@ edrNlfZx0U2uVhaU7DThvSDCAq7nmFHuFGAigO6uM+b8QPB4M0zxrcvKtWO4jwvU
 `;
 
 export const TEST_ENV_VARS = {
-    AWS_REGION: "us-east-2",
+    AWS_SDK_REGION: "us-east-2",
     USER_DATA_BUCKET: "SOME_FAKE_BUCKET",
     USER_DATA_PUBLIC_KEY: testPublicKey,
     CAKE_USER_POOL_ID: "SOME_FAKE_USER_POOL_ID",
