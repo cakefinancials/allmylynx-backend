@@ -9,13 +9,12 @@ export const handler = async function (event, context, container, callback) {
     const envLib = container[BOTTLE_NAMES.LIB_ENV];
     const responseLib = container[BOTTLE_NAMES.LIB_RESPONSE];
     const rollbar = container[BOTTLE_NAMES.LIB_ROLLBAR]
-        .getContextualRollbar('entry.get_bank_info_exists');
+        .getContextualRollbar("get_bank_info_exists.handler");
 
     const userId = event.requestContext.identity.cognitoIdentityId;
     const objectKey = `${userId}/bank_info`;
 
     try {
-        throw new Error('I am a nerd');
         rollbar.log(`Querying for ${objectKey}`);
 
         const response = await awsLib.s3HeadObject(
@@ -28,7 +27,7 @@ export const handler = async function (event, context, container, callback) {
         if (e.code === 'NotFound') {
             callback(null, responseLib.success({ exists: false }));
         } else {
-            rollbar.error(CONSTANTS.FAILURE_MESSAGE, {error: e});
+            rollbar.error(CONSTANTS.FAILURE_MESSAGE, e);
             callback(null, responseLib.failure({ error: CONSTANTS.FAILURE_MESSAGE }));
         }
     }

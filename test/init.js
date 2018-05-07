@@ -24,9 +24,9 @@ edrNlfZx0U2uVhaU7DThvSDCAq7nmFHuFGAigO6uM+b8QPB4M0zxrcvKtWO4jwvU
 
 export const TEST_ENV_VARS = {
     AWS_SDK_REGION: "us-east-2",
+    CAKE_USER_POOL_ID: "SOME_FAKE_USER_POOL_ID",
     USER_DATA_BUCKET: "SOME_FAKE_BUCKET",
     USER_DATA_PUBLIC_KEY: testPublicKey,
-    CAKE_USER_POOL_ID: "SOME_FAKE_USER_POOL_ID",
 };
 
 setDefaultBottleOverrides({
@@ -37,34 +37,26 @@ setDefaultBottleOverrides({
             return envVar;
         }
     }),
-    [BOTTLE_NAMES.LIB_ROLLBAR]: () => {
-        const rollbarFns = [
-            "log",
-            "debug",
-            "info",
-            "warning",
-            "error",
-            "critical",
-        ];
+    [BOTTLE_NAMES.EXTERN_ROLLBAR]: () => {
+        return function TestRollbar(config) {
+            const rollbarFns = [
+                "log",
+                "debug",
+                "info",
+                "warning",
+                "error",
+                "critical",
+            ];
 
-        const rollbar = {};
+            R.forEach((fnName) => {
+                this[fnName] = () => {}
+            }, rollbarFns);
 
-        R.forEach((fnName) => {
-            rollbar[fnName] = (messageOrError, request, custom, callback) => {
-                console.log({
-                    logLevel: fnName,
-                    messageOrError,
-                    request,
-                    custom
-                });
+            this.lambdaHandler = (fn) => {
+                return fn;
+            }
+        }
 
-                if (callback) {
-                    callback();
-                }
-            };
-        }, rollbarFns);
-
-        return rollbar;
+        return TestRollbar;
     }
-
 });

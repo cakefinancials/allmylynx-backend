@@ -8,7 +8,8 @@ export const handler = async function (event, context, container, callback) {
     const awsLib = container[BOTTLE_NAMES.LIB_AWS];
     const envLib = container[BOTTLE_NAMES.LIB_ENV];
     const responseLib = container[BOTTLE_NAMES.LIB_RESPONSE];
-    const rollbar = container[BOTTLE_NAMES.LIB_ROLLBAR];
+    const rollbar = container[BOTTLE_NAMES.LIB_ROLLBAR]
+        .getContextualRollbar("get_brokerage_credentials_exists.handler");
 
     const userId = event.requestContext.identity.cognitoIdentityId;
     const objectKey = `${userId}/brokerage_credentials`
@@ -26,7 +27,7 @@ export const handler = async function (event, context, container, callback) {
         if (e.code === 'NotFound') {
             callback(null, responseLib.success({ exists: false }));
         } else {
-            rollbar.error(CONSTANTS.FAILURE_MESSAGE, {error: e});
+            rollbar.error(CONSTANTS.FAILURE_MESSAGE, e);
             callback(null, responseLib.failure({ error: CONSTANTS.FAILURE_MESSAGE }));
         }
     }

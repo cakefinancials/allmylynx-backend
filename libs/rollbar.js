@@ -23,7 +23,7 @@ export function BOTTLE_FACTORY(container) {
     });
 
     return {
-        getContextualRollbar: (name, baseContext = {}) => {
+        getContextualRollbar: (name) => {
             const rollbarFns = [
                 "log",
                 "debug",
@@ -36,17 +36,11 @@ export function BOTTLE_FACTORY(container) {
             const contextualRollbar = {};
 
             R.forEach((fnName) => {
-                contextualRollbar[fnName] = (message, options = {}) => {
-                    const mergedCustom = R.pipe(
-                        R.propOr({}, "custom"),
-                        R.append(R.__, [{contextName: name}, baseContext]),
-                        R.mergeAll,
-                    )(options);
-                    console.log("merged custom", mergedCustom);
-
+                contextualRollbar[fnName] = (message, ...options) => {
                     const contextualMessage = [name, message].join(': ');
-                    const spreadOptions = R.merge(options, {custom: mergedCustom});
-                    rollbar[fnName](contextualMessage, ...R.values(spreadOptions));
+
+                    rollbar[fnName](contextualMessage, ...options);
+                    console.log({level: fnName, message: contextualMessage, options});
                 };
             }, rollbarFns);
 
