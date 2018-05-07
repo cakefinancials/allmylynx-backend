@@ -7,6 +7,7 @@ import Bottle from "bottlejs";
 import AWS from "aws-sdk";
 import Promise from "bluebird";
 import R from "ramda";
+import Rollbar from "rollbar";
 // for some reason, openpgp.key will be undefined unless we use require syntax
 const openpgp = require('openpgp');
 
@@ -16,18 +17,21 @@ import { BOTTLE_FACTORY as envLibBottleFactory } from "./env";
 import { BOTTLE_FACTORY as helperLibBottleFactory } from "./helper";
 import { BOTTLE_FACTORY as pgpLibBottleFactory } from "./pgp";
 import { BOTTLE_FACTORY as responseLibBottleFactory } from "./response";
+import { BOTTLE_FACTORY as rollbarLibBottleFactory } from "./rollbar";
 
 export const BOTTLE_NAMES = {
     EXTERN_AWS_SDK: "node_modules|aws-sdk",
     EXTERN_BLUEBIRD: "node_modules|bluebird",
     EXTERN_OPENPGP: "node_modules|openpgp",
     EXTERN_RAMDA: "node_modules|ramda",
+    EXTERN_ROLLBAR: "node_modules|rollbar",
 
     LIB_AWS: "lib|aws",
     LIB_ENV: "lib|env",
     LIB_HELPER: "lib|helper",
     LIB_PGP: "lib|pgp",
     LIB_RESPONSE: "lib|response",
+    LIB_ROLLBAR: "lib|rollbar",
 };
 
 export const testBottleBuilderFactory = (defaultMocks = {}) => (overrides = {}) => {
@@ -62,11 +66,14 @@ function buildBottle(overrides = {}) {
         [BOTTLE_NAMES.EXTERN_BLUEBIRD]: () => Promise,
         [BOTTLE_NAMES.EXTERN_OPENPGP]: () => openpgp,
         [BOTTLE_NAMES.EXTERN_RAMDA]: () => R,
+        [BOTTLE_NAMES.EXTERN_ROLLBAR]: () => Rollbar,
+
         [BOTTLE_NAMES.LIB_AWS]: awsLibBottleFactory,
         [BOTTLE_NAMES.LIB_ENV]: envLibBottleFactory,
         [BOTTLE_NAMES.LIB_HELPER]: helperLibBottleFactory,
         [BOTTLE_NAMES.LIB_PGP]: pgpLibBottleFactory,
         [BOTTLE_NAMES.LIB_RESPONSE]: responseLibBottleFactory,
+        [BOTTLE_NAMES.LIB_ROLLBAR]: rollbarLibBottleFactory,
     }, DEFAULT_BOTTLE_OVERRIDES, overrides]);
 
     R.forEachObjIndexed((factory, name) => bottle.factory(name, factory), factories);

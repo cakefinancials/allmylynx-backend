@@ -37,6 +37,7 @@
     "bluebird": "^3.5.1",
     "bottlejs": "^1.7.0",
     "openpgp": "^3.0.3",
-    "ramda": "^0.25.0"
+    "ramda": "^0.25.0",
+    "rollbar": "^2.3.9"
   }
 }

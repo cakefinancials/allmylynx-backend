@@ -12,12 +12,12 @@ export const handler = async function (event, context, container, callback) {
     const envLib = container[BOTTLE_NAMES.LIB_ENV];
     const responseLib = container[BOTTLE_NAMES.LIB_RESPONSE];
     const helperLib = container[BOTTLE_NAMES.LIB_HELPER];
+    const rollbar = container[BOTTLE_NAMES.LIB_ROLLBAR];
 
     const CAKE_USER_POOL_ID = envLib.getEnvVar("CAKE_USER_POOL_ID");
     const cognitoAuthenticationProvider = event.requestContext.identity.cognitoAuthenticationProvider;
     if (!cognitoAuthenticationProvider.includes(CAKE_USER_POOL_ID)) {
-        console.log(CONSTANTS.UNRECOGNIZED_IDENTITY_PROVIDER_FAILURE_MESSAGE);
-        console.log(event.requestContext.identity);
+        rollbar.error(CONSTANTS.UNRECOGNIZED_IDENTITY_PROVIDER_FAILURE_MESSAGE);
         callback(null, responseLib.failure({ error: CONSTANTS.UNRECOGNIZED_IDENTITY_PROVIDER_FAILURE_MESSAGE}));
         return;
     }
@@ -38,14 +38,14 @@ export const handler = async function (event, context, container, callback) {
         const response = await awsLib.cognitoIdentityServiceProviderCall("listUsers", idpParams);
         const users = response["Users"];
         if (users.length === 0) {
-            console.log(CONSTANTS.NO_MATCHING_USERS_FAILURE_MESSAGE);
+            rollbar.error(CONSTANTS.NO_MATCHING_USERS_FAILURE_MESSAGE);
             callback(null, responseLib.failure({ error: CONSTANTS.NO_MATCHING_USERS_FAILURE_MESSAGE }));
             return;
         }
 
         email = (users[0]["Attributes"].find(({Name}) => Name === "email"))["Value"];
     } catch (e) {
-        console.log(e);
+        rollbar.error(e);
         callback(null, responseLib.failure({ error: CONSTANTS.COGNITO_LIST_USERS_FAILURE_MESSAGE }));
         return;
     }
@@ -64,7 +64,7 @@ export const handler = async function (event, context, container, callback) {
     const results = await helperLib.executeAllPromises([createLinkPromise]);
 
     if (results.errors.length > 0) {
-        console.log(CONSTANTS.SAVE_COGNITO_LINK_FAILURE_MESSAGE, {errors: results.errors});
+        rollbar.error(CONSTANTS.SAVE_COGNITO_LINK_FAILURE_MESSAGE, {errors: results.errors});
         callback(null, responseLib.failure({ error: CONSTANTS.SAVE_COGNITO_LINK_FAILURE_MESSAGE }));
     } else {
         callback(null, responseLib.success({ success: true }));

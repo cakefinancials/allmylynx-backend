@@ -8,12 +8,13 @@ export const handler = async function (event, context, container, callback) {
     const awsLib = container[BOTTLE_NAMES.LIB_AWS];
     const envLib = container[BOTTLE_NAMES.LIB_ENV];
     const responseLib = container[BOTTLE_NAMES.LIB_RESPONSE];
+    const rollbar = container[BOTTLE_NAMES.LIB_ROLLBAR];
 
     const userId = event.requestContext.identity.cognitoIdentityId;
     const objectKey = `${userId}/bank_info`;
 
     try {
-        console.log(`Querying for ${objectKey}`);
+        rollbar.log(`Querying for ${objectKey}`);
 
         const response = await awsLib.s3HeadObject(
             envLib.getEnvVar("USER_DATA_BUCKET"),
@@ -25,7 +26,7 @@ export const handler = async function (event, context, container, callback) {
         if (e.code === 'NotFound') {
             callback(null, responseLib.success({ exists: false }));
         } else {
-            console.log(e);
+            rollbar.error(e);
             callback(null, responseLib.failure({ error: CONSTANTS.FAILURE_MESSAGE }));
         }
     }

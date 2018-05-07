@@ -36,5 +36,35 @@ setDefaultBottleOverrides({
 
             return envVar;
         }
-    })
+    }),
+    [BOTTLE_NAMES.LIB_ROLLBAR]: () => {
+        const rollbarFns = [
+            "log",
+            "debug",
+            "info",
+            "warning",
+            "error",
+            "critical",
+        ];
+
+        const rollbar = {};
+
+        R.forEach((fnName) => {
+            rollbar[fnName] = (messageOrError, request, custom, callback) => {
+                console.log({
+                    logLevel: fnName,
+                    messageOrError,
+                    request,
+                    custom
+                });
+
+                if (callback) {
+                    callback();
+                }
+            };
+        }, rollbarFns);
+
+        return rollbar;
+    }
+
 });

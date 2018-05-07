@@ -8,6 +8,7 @@ export const handler = async function (event, context, container, callback) {
     const awsLib = container[BOTTLE_NAMES.LIB_AWS];
     const envLib = container[BOTTLE_NAMES.LIB_ENV];
     const responseLib = container[BOTTLE_NAMES.LIB_RESPONSE];
+    const rollbar = container[BOTTLE_NAMES.LIB_ROLLBAR];
 
     const userId = event.requestContext.identity.cognitoIdentityId;
     const objectKey = `${userId}/obfuscated_brokerage_credentials.json`
@@ -22,7 +23,7 @@ export const handler = async function (event, context, container, callback) {
 
         callback(null, responseLib.success(obfuscatedData));
     } catch (e) {
-        console.log(e);
+        rollbar.error(e);
         callback(null, responseLib.failure({ error: CONSTANTS.FAILURE_MESSAGE }));
     }
 }
