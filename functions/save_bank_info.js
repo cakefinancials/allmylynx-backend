@@ -31,7 +31,7 @@ export const handler = async function (event, context, container, callback) {
     try {
         encryptedS3Object = await pgpLib.encryptText(s3ObjectRawBody);
     } catch (e) {
-        rollbar.error(CONSTANTS.ENCRYPTING_DATA_FAILURE_MESSAGE, e);
+        rollbar.error(CONSTANTS.ENCRYPTING_DATA_FAILURE_MESSAGE, {error: e});
         callback(null, responseLib.failure({ error: CONSTANTS.ENCRYPTING_DATA_FAILURE_MESSAGE }));
         return;
     }
@@ -61,7 +61,7 @@ export const handler = async function (event, context, container, callback) {
     ]);
 
     if (results.errors.length > 0) {
-        rollbar.error(CONSTANTS.S3_UPLOAD_FAILURE_MESSAGE, {errors: results.errors});
+        rollbar.error(CONSTANTS.S3_UPLOAD_FAILURE_MESSAGE, {custom: {errors: results.errors}});
         callback(null, responseLib.failure({ error: CONSTANTS.S3_UPLOAD_FAILURE_MESSAGE }));
     } else {
         callback(null, responseLib.success({ success: true }));

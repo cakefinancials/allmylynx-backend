@@ -26,7 +26,7 @@ export const handler = async function (event, context, container, callback) {
         if (e.code === 'NotFound') {
             callback(null, responseLib.success({ exists: false }));
         } else {
-            rollbar.error(e);
+            rollbar.error(CONSTANTS.FAILURE_MESSAGE, {error: e});
             callback(null, responseLib.failure({ error: CONSTANTS.FAILURE_MESSAGE }));
         }
     }

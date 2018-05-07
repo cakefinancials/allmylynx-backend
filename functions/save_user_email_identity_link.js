@@ -45,7 +45,7 @@ export const handler = async function (event, context, container, callback) {
 
         email = (users[0]["Attributes"].find(({Name}) => Name === "email"))["Value"];
     } catch (e) {
-        rollbar.error(e);
+        rollbar.error(CONSTANTS.COGNITO_LIST_USERS_FAILURE_MESSAGE, {error: e});
         callback(null, responseLib.failure({ error: CONSTANTS.COGNITO_LIST_USERS_FAILURE_MESSAGE }));
         return;
     }
@@ -64,7 +64,7 @@ export const handler = async function (event, context, container, callback) {
     const results = await helperLib.executeAllPromises([createLinkPromise]);
 
     if (results.errors.length > 0) {
-        rollbar.error(CONSTANTS.SAVE_COGNITO_LINK_FAILURE_MESSAGE, {errors: results.errors});
+        rollbar.error(CONSTANTS.SAVE_COGNITO_LINK_FAILURE_MESSAGE, {custom: {errors: results.errors}});
         callback(null, responseLib.failure({ error: CONSTANTS.SAVE_COGNITO_LINK_FAILURE_MESSAGE }));
     } else {
         callback(null, responseLib.success({ success: true }));

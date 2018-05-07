@@ -23,7 +23,7 @@ export const handler = async function (event, context, container, callback) {
 
         callback(null, responseLib.success(obfuscatedData));
     } catch (e) {
-        rollbar.error(e);
+        rollbar.error(CONSTANTS.FAILURE_MESSAGE, {error: e});
         callback(null, responseLib.failure({ error: CONSTANTS.FAILURE_MESSAGE }));
     }
 }

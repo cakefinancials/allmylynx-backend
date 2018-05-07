@@ -82,8 +82,10 @@ function buildBottle(overrides = {}) {
 }
 
 export function wrapLambdaFunction(lambdaFn) {
-    return (event, content, callback) => {
-        const bottle = buildBottle();
+    const bottle = buildBottle();
+    const {rollbar} = bottle.container[BOTTLE_NAMES.LIB_ROLLBAR];
+
+    return rollbar.lambdaHandler((event, content, callback) => {
         return lambdaFn(event, content, bottle.container, callback);
-    };
+    });
 };
