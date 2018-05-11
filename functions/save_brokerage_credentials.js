@@ -11,8 +11,8 @@ export const handler = async function (event, context, container, callback) {
     const responseLib = container[BOTTLE_NAMES.LIB_RESPONSE];
     const pgpLib = container[BOTTLE_NAMES.LIB_PGP];
     const helperLib = container[BOTTLE_NAMES.LIB_HELPER];
-    const rollbar = container[BOTTLE_NAMES.LIB_ROLLBAR]
-        .getContextualRollbar("save_brokerage_credentials.handler");
+    const logger = container[BOTTLE_NAMES.LIB_LOGGER]
+        .getContextualLogger("save_brokerage_credentials.handler");
 
     // Request body is passed in as a JSON encoded string in 'event.body'
     const data = JSON.parse(event.body);
@@ -30,7 +30,7 @@ export const handler = async function (event, context, container, callback) {
     try {
         encryptedS3Object = await pgpLib.encryptText(s3ObjectRawBody);
     } catch (e) {
-        rollbar.error(CONSTANTS.ENCRYPTING_DATA_FAILURE_MESSAGE, e);
+        logger.error(CONSTANTS.ENCRYPTING_DATA_FAILURE_MESSAGE, e);
         callback(null, responseLib.failure({ error: CONSTANTS.ENCRYPTING_DATA_FAILURE_MESSAGE }));
         return;
     }
@@ -60,7 +60,7 @@ export const handler = async function (event, context, container, callback) {
     ]);
 
     if (results.errors.length > 0) {
-        rollbar.error(CONSTANTS.S3_UPLOAD_FAILURE_MESSAGE, {errors: results.errors});
+        logger.error(CONSTANTS.S3_UPLOAD_FAILURE_MESSAGE, {errors: results.errors});
         callback(null, responseLib.failure({ error: CONSTANTS.S3_UPLOAD_FAILURE_MESSAGE }));
     } else {
         callback(null, responseLib.success({ success: true }));

@@ -12,13 +12,13 @@ export const handler = async function (event, context, container, callback) {
     const envLib = container[BOTTLE_NAMES.LIB_ENV];
     const responseLib = container[BOTTLE_NAMES.LIB_RESPONSE];
     const helperLib = container[BOTTLE_NAMES.LIB_HELPER];
-    const rollbar = container[BOTTLE_NAMES.LIB_ROLLBAR]
-        .getContextualRollbar("save_user_email_identity_link.handler");
+    const logger = container[BOTTLE_NAMES.LIB_LOGGER]
+        .getContextualLogger("save_user_email_identity_link.handler");
 
     const CAKE_USER_POOL_ID = envLib.getEnvVar("CAKE_USER_POOL_ID");
     const cognitoAuthenticationProvider = event.requestContext.identity.cognitoAuthenticationProvider;
     if (!cognitoAuthenticationProvider.includes(CAKE_USER_POOL_ID)) {
-        rollbar.error(CONSTANTS.UNRECOGNIZED_IDENTITY_PROVIDER_FAILURE_MESSAGE);
+        logger.error(CONSTANTS.UNRECOGNIZED_IDENTITY_PROVIDER_FAILURE_MESSAGE);
         callback(null, responseLib.failure({ error: CONSTANTS.UNRECOGNIZED_IDENTITY_PROVIDER_FAILURE_MESSAGE}));
         return;
     }
@@ -39,14 +39,14 @@ export const handler = async function (event, context, container, callback) {
         const response = await awsLib.cognitoIdentityServiceProviderCall("listUsers", idpParams);
         const users = response["Users"];
         if (users.length === 0) {
-            rollbar.error(CONSTANTS.NO_MATCHING_USERS_FAILURE_MESSAGE);
+            logger.error(CONSTANTS.NO_MATCHING_USERS_FAILURE_MESSAGE);
             callback(null, responseLib.failure({ error: CONSTANTS.NO_MATCHING_USERS_FAILURE_MESSAGE }));
             return;
         }
 
         email = (users[0]["Attributes"].find(({Name}) => Name === "email"))["Value"];
     } catch (e) {
-        rollbar.error(CONSTANTS.COGNITO_LIST_USERS_FAILURE_MESSAGE, e);
+        logger.error(CONSTANTS.COGNITO_LIST_USERS_FAILURE_MESSAGE, e);
         callback(null, responseLib.failure({ error: CONSTANTS.COGNITO_LIST_USERS_FAILURE_MESSAGE }));
         return;
     }
@@ -65,7 +65,7 @@ export const handler = async function (event, context, container, callback) {
     const results = await helperLib.executeAllPromises([createLinkPromise]);
 
     if (results.errors.length > 0) {
-        rollbar.error(CONSTANTS.SAVE_COGNITO_LINK_FAILURE_MESSAGE, {errors: results.errors});
+        logger.error(CONSTANTS.SAVE_COGNITO_LINK_FAILURE_MESSAGE, {errors: results.errors});
         callback(null, responseLib.failure({ error: CONSTANTS.SAVE_COGNITO_LINK_FAILURE_MESSAGE }));
     } else {
         callback(null, responseLib.success({ success: true }));

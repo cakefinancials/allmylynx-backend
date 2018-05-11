@@ -23,7 +23,7 @@ export function BOTTLE_FACTORY(container) {
     });
 
     return {
-        getContextualRollbar: (name) => {
+        getContextualLogger: (name) => {
             const rollbarFns = [
                 "log",
                 "debug",

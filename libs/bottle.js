@@ -17,7 +17,7 @@ import { BOTTLE_FACTORY as envLibBottleFactory } from "./env";
 import { BOTTLE_FACTORY as helperLibBottleFactory } from "./helper";
 import { BOTTLE_FACTORY as pgpLibBottleFactory } from "./pgp";
 import { BOTTLE_FACTORY as responseLibBottleFactory } from "./response";
-import { BOTTLE_FACTORY as rollbarLibBottleFactory } from "./rollbar";
+import { BOTTLE_FACTORY as loggerLibBottleFactory } from "./logger";
 
 export const BOTTLE_NAMES = {
     EXTERN_AWS_SDK: "node_modules|aws-sdk",
@@ -31,7 +31,7 @@ export const BOTTLE_NAMES = {
     LIB_HELPER: "lib|helper",
     LIB_PGP: "lib|pgp",
     LIB_RESPONSE: "lib|response",
-    LIB_ROLLBAR: "lib|rollbar",
+    LIB_LOGGER: "lib|logger",
 };
 
 export const testBottleBuilderFactory = (defaultMocks = {}) => (overrides = {}) => {
@@ -73,7 +73,7 @@ function buildBottle(overrides = {}) {
         [BOTTLE_NAMES.LIB_HELPER]: helperLibBottleFactory,
         [BOTTLE_NAMES.LIB_PGP]: pgpLibBottleFactory,
         [BOTTLE_NAMES.LIB_RESPONSE]: responseLibBottleFactory,
-        [BOTTLE_NAMES.LIB_ROLLBAR]: rollbarLibBottleFactory,
+        [BOTTLE_NAMES.LIB_LOGGER]: loggerLibBottleFactory,
     }, DEFAULT_BOTTLE_OVERRIDES, overrides]);
 
     R.forEachObjIndexed((factory, name) => bottle.factory(name, factory), factories);
@@ -83,7 +83,7 @@ function buildBottle(overrides = {}) {
 
 export function wrapLambdaFunction(lambdaFn) {
     const bottle = buildBottle();
-    const {rollbar} = bottle.container[BOTTLE_NAMES.LIB_ROLLBAR];
+    const {rollbar} = bottle.container[BOTTLE_NAMES.LIB_LOGGER];
 
     return rollbar.lambdaHandler((event, content, callback) => {
         return lambdaFn(event, content, bottle.container, callback);
