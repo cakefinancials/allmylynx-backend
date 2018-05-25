@@ -21,7 +21,7 @@ describe("get_obfuscated_brokerage_credentials", () => {
 
         before(() => {
             ({bottle, success} = buildTestBottle({
-                [BOTTLE_NAMES.LIB_AWS]: {
+                [BOTTLE_NAMES.CLIENT_AWS]: {
                     s3GetObject: simple.stub().resolveWith({
                         Body: JSON.stringify(responseObject)
                     })
@@ -40,7 +40,7 @@ describe("get_obfuscated_brokerage_credentials", () => {
 
         before(() => {
             ({bottle, failure} = buildTestBottle({
-                [BOTTLE_NAMES.LIB_AWS]: {
+                [BOTTLE_NAMES.CLIENT_AWS]: {
                     s3GetObject: simple.stub().rejectWith("does not matter")
                 }
             }));

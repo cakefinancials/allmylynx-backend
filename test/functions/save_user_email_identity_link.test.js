@@ -22,13 +22,13 @@ describe("save_user_email_identity_link", () => {
     const successResolveText = "does not matter";
 
     const buildTestBottle = testBottleBuilderFactory({
-        [BOTTLE_NAMES.LIB_AWS]: {
+        [BOTTLE_NAMES.CLIENT_AWS]: {
             cognitoIdentityServiceProviderCall: simple.stub().resolveWith({
                 Users: [{Attributes: [{Name: "email", Value: email}]}]
             }),
             s3PutObject: simple.stub().resolveWith(successResolveText),
         },
-        [BOTTLE_NAMES.LIB_PGP]: {
+        [BOTTLE_NAMES.CLIENT_PGP]: {
             encryptText: simple.stub().resolveWith(successResolveText)
         }
     });
@@ -53,7 +53,7 @@ describe("save_user_email_identity_link", () => {
 
         before(() => {
             ({bottle, failure} = buildTestBottle({
-                [BOTTLE_NAMES.LIB_AWS]: {
+                [BOTTLE_NAMES.CLIENT_AWS]: {
                     cognitoIdentityServiceProviderCall: simple.stub().resolveWith({
                         Users: []
                     })
@@ -72,7 +72,7 @@ describe("save_user_email_identity_link", () => {
 
         before(() => {
             ({bottle, failure} = buildTestBottle({
-                [BOTTLE_NAMES.LIB_AWS]: {
+                [BOTTLE_NAMES.CLIENT_AWS]: {
                     cognitoIdentityServiceProviderCall: simple.stub().rejectWith("does not matter")
                 }
             }));
@@ -89,7 +89,7 @@ describe("save_user_email_identity_link", () => {
 
         before(() => {
             ({bottle, failure} = buildTestBottle({
-                [BOTTLE_NAMES.LIB_AWS]: {
+                [BOTTLE_NAMES.CLIENT_AWS]: {
                     s3PutObject: simple.stub().rejectWith("does not matter")
                 }
             }));
@@ -113,7 +113,7 @@ describe("save_user_email_identity_link", () => {
             expect(response).to.deep.equal(success({success: true}));
 
 
-            const [emailLinkUpload] = bottle.container[BOTTLE_NAMES.LIB_AWS].s3PutObject.calls;
+            const [emailLinkUpload] = bottle.container[BOTTLE_NAMES.CLIENT_AWS].s3PutObject.calls;
 
             expect(emailLinkUpload.args).to.deep.equal([
                 TEST_ENV_VARS.USER_DATA_BUCKET,

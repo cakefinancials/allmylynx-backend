@@ -18,10 +18,10 @@ describe("save_brokerage_credentials", () => {
     const successResolveText = "does not matter";
 
     const buildTestBottle = testBottleBuilderFactory({
-        [BOTTLE_NAMES.LIB_AWS]: {
+        [BOTTLE_NAMES.CLIENT_AWS]: {
             s3PutObject: simple.stub().resolveWith(successResolveText)
         },
-        [BOTTLE_NAMES.LIB_PGP]: {
+        [BOTTLE_NAMES.CLIENT_PGP]: {
             encryptText: simple.stub().resolveWith(successResolveText)
         }
     });
@@ -31,7 +31,7 @@ describe("save_brokerage_credentials", () => {
 
         before(() => {
             ({bottle, failure} = buildTestBottle({
-                [BOTTLE_NAMES.LIB_PGP]: {
+                [BOTTLE_NAMES.CLIENT_PGP]: {
                     encryptText: simple.stub().rejectWith("some error")
                 }
             }));
@@ -48,7 +48,7 @@ describe("save_brokerage_credentials", () => {
 
         before(() => {
             ({bottle, failure} = buildTestBottle({
-                [BOTTLE_NAMES.LIB_AWS]: {
+                [BOTTLE_NAMES.CLIENT_AWS]: {
                     s3PutObject: simple.stub().rejectWith("some error")
                 }
             }));
@@ -72,7 +72,7 @@ describe("save_brokerage_credentials", () => {
             expect(response).to.deep.equal(success({success: true}));
 
             const [encryptedUpload, obfuscatedUpload] =
-                bottle.container[BOTTLE_NAMES.LIB_AWS].s3PutObject.calls;
+                bottle.container[BOTTLE_NAMES.CLIENT_AWS].s3PutObject.calls;
 
             const USER_DATA_BUCKET = TEST_ENV_VARS.USER_DATA_BUCKET;
 

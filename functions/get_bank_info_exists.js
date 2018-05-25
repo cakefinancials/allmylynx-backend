@@ -5,8 +5,8 @@ export const CONSTANTS = {
 };
 
 export const handler = async function (event, context, container, callback) {
-    const awsLib = container[BOTTLE_NAMES.LIB_AWS];
-    const envLib = container[BOTTLE_NAMES.LIB_ENV];
+    const awsLib = container[BOTTLE_NAMES.CLIENT_AWS];
+    const envLib = container[BOTTLE_NAMES.CLIENT_ENV];
     const responseLib = container[BOTTLE_NAMES.LIB_RESPONSE];
     const logger = container[BOTTLE_NAMES.LIB_LOGGER]
         .getContextualLogger("get_bank_info_exists.handler");

@@ -1,8 +1,7 @@
-import { BOTTLE_NAMES } from "./bottle";
-
 export function BOTTLE_FACTORY(container) {
+    const BOTTLE_NAMES = container.BOTTLE_NAMES;
     const AWS = container[BOTTLE_NAMES.EXTERN_AWS_SDK];
-    const envLib = container[BOTTLE_NAMES.LIB_ENV];
+    const envLib = container[BOTTLE_NAMES.CLIENT_ENV];
 
     AWS.config.update({ region: envLib.getEnvVar("AWS_SDK_REGION") });
 

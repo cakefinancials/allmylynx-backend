@@ -30,7 +30,7 @@ export const TEST_ENV_VARS = {
 };
 
 setDefaultBottleOverrides({
-    [BOTTLE_NAMES.LIB_ENV]: () => ({
+    [BOTTLE_NAMES.CLIENT_ENV]: () => ({
         getEnvVar: (name) => {
             const envVar = R.path([name], TEST_ENV_VARS);
 

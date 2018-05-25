@@ -20,7 +20,7 @@ describe("get_brokerage_credentials_exists", () => {
 
         before(() => {
             ({bottle, success} = buildTestBottle({
-                [BOTTLE_NAMES.LIB_AWS]: {
+                [BOTTLE_NAMES.CLIENT_AWS]: {
                     s3HeadObject: simple.stub().resolveWith("does not matter")
                 }
             }));
@@ -37,7 +37,7 @@ describe("get_brokerage_credentials_exists", () => {
 
         before(() => {
             ({bottle, success} = buildTestBottle({
-                [BOTTLE_NAMES.LIB_AWS]: {
+                [BOTTLE_NAMES.CLIENT_AWS]: {
                     s3HeadObject: simple.stub().rejectWith({code: "NotFound"})
                 }
             }));
@@ -54,7 +54,7 @@ describe("get_brokerage_credentials_exists", () => {
 
         before(() => {
             ({bottle, failure} = buildTestBottle({
-                [BOTTLE_NAMES.LIB_AWS]: {
+                [BOTTLE_NAMES.CLIENT_AWS]: {
                     s3HeadObject: simple.stub().rejectWith({code: "Some Random Code"})
                 }
             }));

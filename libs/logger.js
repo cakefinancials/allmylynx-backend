@@ -1,11 +1,9 @@
 /**
  * Helper file to configure rollbar for our package
  */
-
-import { BOTTLE_NAMES } from "./bottle";
-
 export function BOTTLE_FACTORY(container) {
-    const envLib = container[BOTTLE_NAMES.LIB_ENV];
+    const BOTTLE_NAMES = container.BOTTLE_NAMES;
+    const envLib = container[BOTTLE_NAMES.CLIENT_ENV];
     const R = container[BOTTLE_NAMES.EXTERN_RAMDA];
     const Rollbar = container[BOTTLE_NAMES.EXTERN_ROLLBAR];
 

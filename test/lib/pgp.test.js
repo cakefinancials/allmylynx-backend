@@ -5,7 +5,7 @@ import { BOTTLE_NAMES, testBottleBuilderFactory } from "../../libs/bottle";
 
 const buildTestBottle = testBottleBuilderFactory();
 const {bottle} = buildTestBottle();
-const pgpLib = bottle.container[BOTTLE_NAMES.LIB_PGP];
+const pgpLib = bottle.container[BOTTLE_NAMES.CLIENT_PGP];
 
 describe("pgp", () => {
     describe("encryptText", () => {

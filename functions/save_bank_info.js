@@ -1,5 +1,3 @@
-import Promise from "bluebird";
-
 import { BOTTLE_NAMES, wrapLambdaFunction } from "../libs/bottle";
 
 export const CONSTANTS = {
@@ -8,10 +6,10 @@ export const CONSTANTS = {
 };
 
 export const handler = async function (event, context, container, callback) {
-    const awsLib = container[BOTTLE_NAMES.LIB_AWS];
-    const envLib = container[BOTTLE_NAMES.LIB_ENV];
+    const awsLib = container[BOTTLE_NAMES.CLIENT_AWS];
+    const envLib = container[BOTTLE_NAMES.CLIENT_ENV];
     const responseLib = container[BOTTLE_NAMES.LIB_RESPONSE];
-    const pgpLib = container[BOTTLE_NAMES.LIB_PGP];
+    const pgpLib = container[BOTTLE_NAMES.CLIENT_PGP];
     const helperLib = container[BOTTLE_NAMES.LIB_HELPER];
     const logger = container[BOTTLE_NAMES.LIB_LOGGER]
         .getContextualLogger("save_bank_info.handler");

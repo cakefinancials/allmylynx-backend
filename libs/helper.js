@@ -1,6 +1,5 @@
-import { BOTTLE_NAMES } from "./bottle";
-
 export function BOTTLE_FACTORY(container) {
+    const BOTTLE_NAMES = container.BOTTLE_NAMES;
     const Promise = container[BOTTLE_NAMES.EXTERN_BLUEBIRD];
 
     const SERVICE = {
