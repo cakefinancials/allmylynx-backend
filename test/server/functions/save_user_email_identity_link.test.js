@@ -3,11 +3,11 @@ import simple from "simple-mock";
 import Promise from "bluebird";
 import R from "ramda";
 
-import { handler, CONSTANTS } from "../../functions/save_user_email_identity_link";
-import { getDefaultEvent, getDefaultContext } from "../helpers/defaults";
-import { TEST_ENV_VARS } from "../init";
+import { handler, CONSTANTS } from "../../../server/functions/save_user_email_identity_link";
+import { getDefaultEvent, getDefaultContext } from "../../helpers/defaults";
+import { TEST_ENV_VARS } from "../../init";
 
-import { BOTTLE_NAMES, testBottleBuilderFactory } from "../../libs/bottle";
+import { BOTTLE_NAMES, testBottleBuilderFactory } from "../../../server/libs/bottle";
 
 describe("save_user_email_identity_link", () => {
     const handlerPromise = Promise.promisify(handler);

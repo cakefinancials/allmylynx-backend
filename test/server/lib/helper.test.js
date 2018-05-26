@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import simple from "simple-mock";
 
-import { BOTTLE_NAMES, testBottleBuilderFactory } from "../../libs/bottle";
+import { BOTTLE_NAMES, testBottleBuilderFactory } from "../../../server/libs/bottle";
 
 const buildTestBottle = testBottleBuilderFactory();
 const {bottle} = buildTestBottle();

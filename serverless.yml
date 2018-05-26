@@ -38,7 +38,7 @@ provider:
 
 functions:
   save_user_email_identity_link:
-    handler: functions/save_user_email_identity_link.main
+    handler: server/functions/save_user_email_identity_link.main
     environment:
       CAKE_USER_POOL_ID: ${s3:cake-financials-config/CAKE_USER_POOL_ID}
       USER_DATA_BUCKET: ${s3:cake-financials-config/USER_DATA_BUCKET}
@@ -50,7 +50,7 @@ functions:
           authorizer: aws_iam
 
   save_brokerage_creds:
-    handler: functions/save_brokerage_credentials.main
+    handler: server/functions/save_brokerage_credentials.main
     environment:
       USER_DATA_PUBLIC_KEY: ${s3:cake-financials-config/USER_DATA_PUBLIC_KEY}
       USER_DATA_BUCKET: ${s3:cake-financials-config/USER_DATA_BUCKET}
@@ -62,7 +62,7 @@ functions:
           authorizer: aws_iam
 
   get_brokerage_creds_exists:
-    handler: functions/get_brokerage_credentials_exists.main
+    handler: server/functions/get_brokerage_credentials_exists.main
     environment:
       USER_DATA_BUCKET: ${s3:cake-financials-config/USER_DATA_BUCKET}
     events:
@@ -73,7 +73,7 @@ functions:
           authorizer: aws_iam
 
   get_obf_brokerage_creds:
-    handler: functions/get_obfuscated_brokerage_credentials.main
+    handler: server/functions/get_obfuscated_brokerage_credentials.main
     environment:
       USER_DATA_BUCKET: ${s3:cake-financials-config/USER_DATA_BUCKET}
     events:
@@ -84,7 +84,7 @@ functions:
           authorizer: aws_iam
 
   save_bank_info:
-    handler: functions/save_bank_info.main
+    handler: server/functions/save_bank_info.main
     environment:
       USER_DATA_PUBLIC_KEY: ${s3:cake-financials-config/USER_DATA_PUBLIC_KEY}
       USER_DATA_BUCKET: ${s3:cake-financials-config/USER_DATA_BUCKET}
@@ -96,7 +96,7 @@ functions:
           authorizer: aws_iam
 
   get_bank_info_exists:
-    handler: functions/get_bank_info_exists.main
+    handler: server/functions/get_bank_info_exists.main
     environment:
       USER_DATA_BUCKET: ${s3:cake-financials-config/USER_DATA_BUCKET}
     events:
@@ -107,7 +107,7 @@ functions:
           authorizer: aws_iam
 
   get_obf_bank_info:
-    handler: functions/get_obfuscated_bank_info.main
+    handler: server/functions/get_obfuscated_bank_info.main
     environment:
       USER_DATA_BUCKET: ${s3:cake-financials-config/USER_DATA_BUCKET}
     events:

@@ -1,6 +1,6 @@
 import R from "ramda";
 
-import { setDefaultBottleOverrides, BOTTLE_NAMES } from "../libs/bottle";
+import { setDefaultBottleOverrides, BOTTLE_NAMES } from "../server/libs/bottle";
 
 const testPublicKey = `
 -----BEGIN PGP PUBLIC KEY BLOCK-----

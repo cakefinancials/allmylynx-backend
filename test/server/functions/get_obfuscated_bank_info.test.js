@@ -2,12 +2,12 @@ import { expect } from "chai";
 import simple from "simple-mock";
 import Promise from "bluebird";
 
-import { handler, CONSTANTS } from "../../functions/get_obfuscated_brokerage_credentials";
-import { getDefaultEvent, getDefaultContext } from "../helpers/defaults";
+import { handler, CONSTANTS } from "../../../server/functions/get_obfuscated_bank_info";
+import { getDefaultEvent, getDefaultContext } from "../../helpers/defaults";
 
-import { BOTTLE_NAMES, testBottleBuilderFactory } from "../../libs/bottle";
+import { BOTTLE_NAMES, testBottleBuilderFactory } from "../../../server/libs/bottle";
 
-describe("get_obfuscated_brokerage_credentials", () => {
+describe("get_obfuscated_bank_info", () => {
     const handlerPromise = Promise.promisify(handler);
     const defaultEvent = getDefaultEvent();
     const defaultContext = getDefaultContext();
