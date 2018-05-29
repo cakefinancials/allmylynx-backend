@@ -30,6 +30,14 @@ const tests = [
         fnName: "get_obf_brokerage_creds",
         mock: "get_obfuscated_brokerage_credentials-event.json",
     },
+    {
+        fnName: "save_user_state_bag",
+        mock: "save_user_state_bag-event.json",
+    },
+    {
+        fnName: "get_user_state_bag",
+        mock: "get_user_state_bag-event.json",
+    },
 ];
 
 tests.forEach(test => {

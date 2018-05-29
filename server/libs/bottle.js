@@ -25,8 +25,8 @@ import { BOTTLE_FACTORY as lambdaEnvironmentHelperBF } from "../services/lambda_
 import { BOTTLE_FACTORY as s3KeyGeneratorServiceBF } from "../services/s3_key_generator";
 import { BOTTLE_FACTORY as userStateBagServiceBF } from "../services/user_state_bag";
 
-import { BOTTLE_FACTORY as getUserStateBagBF } from "../functions/get_user_state_bag";
-import { BOTTLE_FACTORY as saveUserStateBagBF } from "../functions/save_user_state_bag";
+import { BOTTLE_FACTORY as getUserStateBagBF } from "../functions/get_user_state_bag/service";
+import { BOTTLE_FACTORY as saveUserStateBagBF } from "../functions/save_user_state_bag/service";
 
 export const BOTTLE_NAMES = {
     EXTERN_AWS_SDK: "node_modules|aws-sdk",

@@ -118,7 +118,7 @@ functions:
           authorizer: aws_iam
 
   get_user_state_bag:
-    handler: server/functions/get_user_state_bag.main
+    handler: server/functions/get_user_state_bag/entry.main
     environment:
       USER_DATA_BUCKET: ${s3:cake-financials-config/USER_DATA_BUCKET}
     events:
@@ -129,7 +129,7 @@ functions:
           authorizer: aws_iam
 
   save_user_state_bag:
-    handler: server/functions/save_user_state_bag.main
+    handler: server/functions/save_user_state_bag/entry.main
     environment:
       USER_DATA_BUCKET: ${s3:cake-financials-config/USER_DATA_BUCKET}
     events:

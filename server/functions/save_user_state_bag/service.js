@@ -1,6 +1,5 @@
-import { BOTTLE_NAMES, exportLambdaFunction } from "../libs/bottle";
-
 export function BOTTLE_FACTORY(container) {
+    const BOTTLE_NAMES = container.BOTTLE_NAMES;
     const logger = container[BOTTLE_NAMES.LIB_LOGGER]
         .getContextualLogger("save_user_state_bag.handler");
 
@@ -25,5 +24,3 @@ export function BOTTLE_FACTORY(container) {
 
     return SERVICE;
 }
-
-export const main = exportLambdaFunction(BOTTLE_NAMES.FUNCTION_SAVE_USER_STATE_BAG);
