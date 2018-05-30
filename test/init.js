@@ -1,3 +1,6 @@
+import chai from 'chai';
+import chaiAsPromised from 'chai-as-promised';
+chai.use(chaiAsPromised);
 import R from "ramda";
 
 import { setDefaultBottleOverrides, BOTTLE_NAMES } from "../server/libs/bottle";
