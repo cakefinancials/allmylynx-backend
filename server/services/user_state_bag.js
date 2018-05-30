@@ -14,24 +14,20 @@ export function BOTTLE_FACTORY(container) {
 
     const awsLib = container[BOTTLE_NAMES.CLIENT_AWS];
     const envLib = container[BOTTLE_NAMES.CLIENT_ENV];
-    const lambdaEnvironmentHelper = container[BOTTLE_NAMES.SERVICE_LAMBDA_ENVIRONMENT_HELPER];
     const logger = container[BOTTLE_NAMES.LIB_LOGGER]
         .getContextualLogger("service.user_state_bag");
     const NestedError = container[BOTTLE_NAMES.EXTERN_NESTED_ERROR];
     const s3KeyGeneratorService = container[BOTTLE_NAMES.SERVICE_S3_KEY_GENERATOR];
 
     const CONSTANTS = {
-        READ_USER_STATE_FAILURE_MESSAGE: 'Failed to read user state',
-        WRITE_USER_STATE_FAILURE_MESSAGE: 'Failed to write user state'
+        READ_USER_STATE_FAILURE_MESSAGE: "Failed to read user state",
+        WRITE_USER_STATE_FAILURE_MESSAGE: "Failed to write user state"
     };
 
     const SERVICE = {
         CONSTANTS,
 
-        writeUserState: async (lambdaEvent) => {
-            const userId = lambdaEnvironmentHelper.getCognitoIdentityId(lambdaEvent);
-            const userState = lambdaEnvironmentHelper.getHTTPBody(lambdaEvent);
-
+        writeUserState: async (userId, userState) => {
             const userStateBagKey = s3KeyGeneratorService.getUserStateBagKey(userId);
             const userDataBucket = envLib.getEnvVar("USER_DATA_BUCKET");
 
@@ -62,9 +58,7 @@ export function BOTTLE_FACTORY(container) {
             }
         },
 
-        readUserState: async (lambdaEvent) => {
-            const userId = lambdaEnvironmentHelper.getCognitoIdentityId(lambdaEvent);
-
+        readUserState: async (userId) => {
             const userStateBagKey = s3KeyGeneratorService.getUserStateBagKey(userId);
             const userDataBucket = envLib.getEnvVar("USER_DATA_BUCKET");
 
@@ -77,7 +71,7 @@ export function BOTTLE_FACTORY(container) {
                 const userStateBag = JSON.parse(new String(response.Body));
                 return userStateBag;
             } catch (error) {
-                if (error.code === 'NoSuchKey') {
+                if (error.code === "NoSuchKey") {
                     return {};
                 }
 
