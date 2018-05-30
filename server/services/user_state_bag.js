@@ -44,16 +44,21 @@ export function BOTTLE_FACTORY(container) {
 
                 return { success: true };
             } catch (error) {
-                logger.error(
+                const wrappedError = logger.createWrappedError(
+                    'WriteUserStateError',
                     CONSTANTS.WRITE_USER_STATE_FAILURE_MESSAGE,
-                    error,
+                    error
+                );
+
+                logger.error(
+                    wrappedError,
                     {
                         userStateBagKey,
                         userState
                     }
                 );
 
-                throw new NestedError(CONSTANTS.WRITE_USER_STATE_FAILURE_MESSAGE, error);
+                throw wrappedError;
             }
         },
 

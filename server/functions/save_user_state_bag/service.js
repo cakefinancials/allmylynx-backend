@@ -16,7 +16,12 @@ export function BOTTLE_FACTORY(container) {
                 const writeResponse = await userStateBagService.writeUserState(event);
                 callback(null, responseLib.success(writeResponse));
             } catch (e) {
-                logger.error(CONSTANTS.FAILURE_MESSAGE, e, { event, context });
+                const wrappedError = logger.createWrappedError(
+                    'SaveUserStateBagError',
+                    CONSTANTS.FAILURE_MESSAGE,
+                    e
+                );
+                logger.error(wrappedError, { event, context });
                 callback(null, responseLib.failure({ error: CONSTANTS.FAILURE_MESSAGE }));
             }
         }

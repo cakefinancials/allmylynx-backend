@@ -55,6 +55,8 @@ setDefaultBottleOverrides({
             this.lambdaHandler = (fn) => {
                 return fn;
             }
+
+            this.configure = () => { return this; }
         }
 
         return TestRollbar;

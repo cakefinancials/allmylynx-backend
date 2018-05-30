@@ -4,6 +4,7 @@
 export function BOTTLE_FACTORY(container) {
     const BOTTLE_NAMES = container.BOTTLE_NAMES;
     const envLib = container[BOTTLE_NAMES.CLIENT_ENV];
+    const NestedError = container[BOTTLE_NAMES.EXTERN_NESTED_ERROR];
     const R = container[BOTTLE_NAMES.EXTERN_RAMDA];
     const Rollbar = container[BOTTLE_NAMES.EXTERN_ROLLBAR];
 
@@ -20,6 +21,18 @@ export function BOTTLE_FACTORY(container) {
         verbose: true,
     });
 
+    const createWrappedError = (errorName, message, nestedError) => {
+        const util = require('util');
+
+        function WrappedError(msg, nested) {
+            NestedError.call(this, msg, nested);
+        }
+        util.inherits(WrappedError, NestedError);
+        WrappedError.prototype.name = errorName;
+
+        return new WrappedError(message, nestedError);
+    };
+
     return {
         getContextualLogger: (name) => {
             const rollbarFns = [
@@ -31,14 +44,22 @@ export function BOTTLE_FACTORY(container) {
                 "critical",
             ];
 
-            const contextualRollbar = {};
+            const contextualRollbar = { createWrappedError };
 
             R.forEach((fnName) => {
-                contextualRollbar[fnName] = (message, ...options) => {
-                    const contextualMessage = [name, message].join(': ');
+                contextualRollbar[fnName] = (...options) => {
+                    const isStr = (opt) => typeof opt === 'string' || opt instanceof String;
+
+                    const strOptions = R.filter(isStr, options);
+                    const nonStrOptions = R.reject(isStr, options);
+
+                    const message = R.head(strOptions);
+
+                    const contextualMessage = R.isNil(message) ? name : [name, message].join(': ');
 
                     rollbar[fnName](contextualMessage, ...options);
-                    console.log({level: fnName, message: contextualMessage, options});
+
+                    console.log({level: fnName, message: contextualMessage, nonStrOptions});
                 };
             }, rollbarFns);
 
