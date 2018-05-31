@@ -22,14 +22,13 @@ export function BOTTLE_FACTORY(container) {
     });
 
     const createWrappedError = (errorName, message, nestedError) => {
-        const util = require('util');
-
-        function WrappedError(msg, nested) {
-            NestedError.call(this, msg, nested);
+        class WrappedError extends NestedError {
+            constructor(msg, nested) {
+                super(msg, nested);
+            }
         }
-        util.inherits(WrappedError, NestedError);
-        WrappedError.prototype.name = errorName;
 
+        WrappedError.prototype.name = errorName;
         return new WrappedError(message, nestedError);
     };
 

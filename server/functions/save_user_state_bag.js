@@ -15,9 +15,9 @@ export function BOTTLE_FACTORY(container) {
         CONSTANTS,
         handler: async (event, context, callback) => {
             try {
-                const userId = lambdaEnvironmentHelper.getCognitoIdentityId(lambdaEvent);
+                const userId = lambdaEnvironmentHelper.getCognitoIdentityId(event);
                 // need to check for previous and next here
-                const userState = lambdaEnvironmentHelper.getHTTPBody(lambdaEvent);
+                const userState = lambdaEnvironmentHelper.getHTTPBody(event);
 
                 const writeResponse = await userStateBagService.writeUserState(userId, userState);
                 callback(null, responseLib.success(writeResponse));
