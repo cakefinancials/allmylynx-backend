@@ -8,7 +8,8 @@ export function BOTTLE_FACTORY(container) {
     const userStateBagService = container[BOTTLE_NAMES.SERVICE_USER_STATE_BAG];
 
     const CONSTANTS = {
-        FAILURE_MESSAGE: 'Failed to save the state bag for the user'
+        FAILURE_MESSAGE: "Failed to save the state bag for the user",
+        SAVE_USER_STATE_BAG_ERROR: "SaveUserStateBagError"
     };
 
     const SERVICE = {
@@ -22,12 +23,12 @@ export function BOTTLE_FACTORY(container) {
                 const writeResponse = await userStateBagService.writeUserState(userId, userState);
                 callback(null, responseLib.success(writeResponse));
             } catch (e) {
-                const wrappedError = logger.createWrappedError(
-                    'SaveUserStateBagError',
+                logger.createAndLogWrappedError(
+                    CONSTANTS.SAVE_USER_STATE_BAG_ERROR,
                     CONSTANTS.FAILURE_MESSAGE,
-                    e
+                    e,
+                    { event, context }
                 );
-                logger.error(wrappedError, { event, context });
                 callback(null, responseLib.failure({ error: CONSTANTS.FAILURE_MESSAGE }));
             }
         }

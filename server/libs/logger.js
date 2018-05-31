@@ -62,6 +62,14 @@ export function BOTTLE_FACTORY(container) {
                 };
             }, rollbarFns);
 
+            contextualRollbar.createAndLogWrappedError = (errorName, message, nestedError, context) => {
+                const wrappedError = createWrappedError(errorName, message, nestedError);
+
+                contextualRollbar.error(wrappedError, context);
+
+                return wrappedError;
+            };
+
             return contextualRollbar;
         },
 

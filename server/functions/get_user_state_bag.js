@@ -7,7 +7,8 @@ export function BOTTLE_FACTORY(container) {
     const userStateBagService = container[BOTTLE_NAMES.SERVICE_USER_STATE_BAG];
 
     const CONSTANTS = {
-        FAILURE_MESSAGE: 'Failed to retrieve the state bag for the user'
+        FAILURE_MESSAGE: "Failed to retrieve the state bag for the user",
+        GET_USER_STATE_BAG_ERROR: "GetUserStateBagError"
     };
 
     const SERVICE = {
@@ -17,12 +18,12 @@ export function BOTTLE_FACTORY(container) {
                 const userStateBag = await userStateBagService.readUserState(event);
                 callback(null, responseLib.success(userStateBag));
             } catch (e) {
-                const wrappedError = logger.createWrappedError(
-                    'GetUserStateBagError',
+                logger.createAndLogWrappedError(
+                    CONSTANTS.GET_USER_STATE_BAG_ERROR,
                     CONSTANTS.FAILURE_MESSAGE,
-                    e
+                    e,
+                    { event, context }
                 );
-                logger.error(CONSTANTS.FAILURE_MESSAGE, e, { event, context });
                 callback(null, responseLib.failure({ error: CONSTANTS.FAILURE_MESSAGE }));
             }
         }

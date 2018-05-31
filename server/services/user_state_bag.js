@@ -21,7 +21,8 @@ export function BOTTLE_FACTORY(container) {
 
     const CONSTANTS = {
         READ_USER_STATE_FAILURE_MESSAGE: "Failed to read user state",
-        WRITE_USER_STATE_FAILURE_MESSAGE: "Failed to write user state"
+        WRITE_USER_STATE_FAILURE_MESSAGE: "Failed to write user state",
+        WRITE_USER_STATE_ERROR: "WriteUserStateError",
     };
 
     const SERVICE = {
@@ -40,18 +41,11 @@ export function BOTTLE_FACTORY(container) {
 
                 return { success: true };
             } catch (error) {
-                const wrappedError = logger.createWrappedError(
-                    'WriteUserStateError',
+                const wrappedError = logger.createAndLogWrappedError(
+                    CONSTANTS.WRITE_USER_STATE_ERROR,
                     CONSTANTS.WRITE_USER_STATE_FAILURE_MESSAGE,
-                    error
-                );
-
-                logger.error(
-                    wrappedError,
-                    {
-                        userStateBagKey,
-                        userState
-                    }
+                    error,
+                    { userStateBagKey, userState }
                 );
 
                 throw wrappedError;
