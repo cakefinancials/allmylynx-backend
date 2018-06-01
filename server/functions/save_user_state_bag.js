@@ -9,7 +9,7 @@ export function BOTTLE_FACTORY(container) {
 
     const CONSTANTS = {
         FAILURE_MESSAGE: "Failed to save the state bag for the user",
-        SAVE_USER_STATE_BAG_ERROR: "SaveUserStateBagError"
+        SAVE_USER_STATE_BAG_ERROR: "SaveUserStateBagError",
     };
 
     const SERVICE = {
@@ -18,9 +18,15 @@ export function BOTTLE_FACTORY(container) {
             try {
                 const userId = lambdaEnvironmentHelper.getCognitoIdentityId(event);
                 // need to check for previous and next here
-                const userState = lambdaEnvironmentHelper.getHTTPBody(event);
+                const httpBody = lambdaEnvironmentHelper.getHTTPBody(event);
+                console.log(httpBody);
+                const { previousState, nextState } = httpBody;
 
-                const writeResponse = await userStateBagService.writeUserState(userId, userState);
+                const currentState = await userStateBagService.readUserState(userId);
+
+                userStateBagService.verifyPreviousStateEqualsCurrentState(previousState, currentState);
+
+                const writeResponse = await userStateBagService.writeUserState(userId, nextState);
                 callback(null, responseLib.success(writeResponse));
             } catch (e) {
                 logger.createAndLogWrappedError(

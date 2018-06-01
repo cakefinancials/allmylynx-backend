@@ -4,5 +4,5 @@
             "cognitoIdentityId": "USER-SUB-1234"
         }
     },
-    "body": "{\"some\":\"state\",\"of\":\"the\", \"current\": \"user\"}"
+    "body": "{\"nextState\":{\"some\":\"state\",\"of\":\"the\",\"current\":\"user\"},\"previousState\":{}}"
 }

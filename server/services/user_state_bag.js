@@ -12,6 +12,7 @@
 export function BOTTLE_FACTORY(container) {
     const BOTTLE_NAMES = container.BOTTLE_NAMES;
 
+    const assert = container[BOTTLE_NAMES.NATIVE_ASSERT];
     const awsLib = container[BOTTLE_NAMES.CLIENT_AWS];
     const envLib = container[BOTTLE_NAMES.CLIENT_ENV];
     const logger = container[BOTTLE_NAMES.LIB_LOGGER]
@@ -20,13 +21,32 @@ export function BOTTLE_FACTORY(container) {
     const s3KeyGeneratorService = container[BOTTLE_NAMES.SERVICE_S3_KEY_GENERATOR];
 
     const CONSTANTS = {
+        READ_USER_STATE_ERROR: "ReadUserStateError",
         READ_USER_STATE_FAILURE_MESSAGE: "Failed to read user state",
-        WRITE_USER_STATE_FAILURE_MESSAGE: "Failed to write user state",
         WRITE_USER_STATE_ERROR: "WriteUserStateError",
+        WRITE_USER_STATE_FAILURE_MESSAGE: "Failed to write user state",
+        VERIFY_PREVIOUS_EQUALS_CURRENT_ERROR: "VerifyPreviousEqualsCurrentError",
+        VERIFY_PREVIOUS_EQUALS_CURRENT_FAILURE_MESSAGE: "Failed to write user state",
     };
 
     const SERVICE = {
         CONSTANTS,
+
+        verifyPreviousStateEqualsCurrentState: (previousState, currentState) => {
+            try {
+                assert.deepStrictEqual(
+                    previousState,
+                    currentState
+                );
+            } catch (e) {
+                throw logger.createAndLogWrappedError(
+                    CONSTANTS.VERIFY_PREVIOUS_EQUALS_CURRENT_ERROR,
+                    CONSTANTS.VERIFY_PREVIOUS_EQUALS_CURRENT_FAILURE_MESSAGE,
+                    e,
+                    { previousState, currentState }
+                );
+            }
+        },
 
         writeUserState: async (userId, userState) => {
             const userStateBagKey = s3KeyGeneratorService.getUserStateBagKey(userId);
@@ -41,14 +61,12 @@ export function BOTTLE_FACTORY(container) {
 
                 return { success: true };
             } catch (error) {
-                const wrappedError = logger.createAndLogWrappedError(
+                throw logger.createAndLogWrappedError(
                     CONSTANTS.WRITE_USER_STATE_ERROR,
                     CONSTANTS.WRITE_USER_STATE_FAILURE_MESSAGE,
                     error,
                     { userStateBagKey, userState }
                 );
-
-                throw wrappedError;
             }
         },
 
@@ -69,15 +87,12 @@ export function BOTTLE_FACTORY(container) {
                     return {};
                 }
 
-                const nestedError = new NestedError(CONSTANTS.READ_USER_STATE_FAILURE_MESSAGE, error);
-
-                logger.error(
+                throw logger.createAndLogWrappedError(
+                    CONSTANTS.READ_USER_STATE_ERROR,
                     CONSTANTS.READ_USER_STATE_FAILURE_MESSAGE,
-                    nestedError,
+                    error,
                     { userStateBagKey }
                 );
-
-                throw nestedError;
             }
         },
     };

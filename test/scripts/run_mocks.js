@@ -40,11 +40,15 @@ const tests = [
     },
 ];
 
+console.log('CLEANING OUT S3 BUCKET FOR "USER-SUB-1234"');
+execSync('aws s3 rm s3://cake-financials-user-data/USER-SUB-1234/ --recursive --profile cake-financials');
+
 tests.forEach(test => {
     const fnName = test.fnName;
     const mock = test.mock;
 
     try {
+        console.log('RUNNING: ', fnName);
         const result = execSync(
             `serverless invoke local --function ${fnName} --path mocks/${mock}`
         );

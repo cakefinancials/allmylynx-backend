@@ -4,7 +4,7 @@ export function BOTTLE_FACTORY(container) {
 
     const SERVICE = {
         getUserStateBagKey: (userId) => {
-            const userStateBagKey = `user_state_bag/${userId}.json`;
+            const userStateBagKey = `${userId}/user_state_bag.json`;
             return userStateBagKey;
         }
     };

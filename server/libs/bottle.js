@@ -29,6 +29,8 @@ import { BOTTLE_FACTORY as getUserStateBagBF } from "../functions/get_user_state
 import { BOTTLE_FACTORY as saveUserStateBagBF } from "../functions/save_user_state_bag";
 
 export const BOTTLE_NAMES = {
+    NATIVE_ASSERT: "native|assert",
+
     EXTERN_AWS_SDK: "node_modules|aws-sdk",
     EXTERN_BLUEBIRD: "node_modules|bluebird",
     EXTERN_NESTED_ERROR: "node_modules|nested-error-stacks",
@@ -81,6 +83,8 @@ function buildBottle(overrides = {}) {
 
     const factories = R.mergeAll([{
         BOTTLE_NAMES: () => BOTTLE_NAMES,
+        [BOTTLE_NAMES.NATIVE_ASSERT]: () => require("assert"),
+
         [BOTTLE_NAMES.EXTERN_AWS_SDK]: () => AWS,
         [BOTTLE_NAMES.EXTERN_BLUEBIRD]: () => Promise,
         [BOTTLE_NAMES.EXTERN_NESTED_ERROR]: () => NestedError,
