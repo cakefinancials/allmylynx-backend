@@ -3,6 +3,7 @@ export function BOTTLE_FACTORY(container) {
     const logger = container[BOTTLE_NAMES.LIB_LOGGER]
         .getContextualLogger("get_user_state_bag.handler");
 
+    const lambdaEnvironmentHelper = container[BOTTLE_NAMES.SERVICE_LAMBDA_ENVIRONMENT_HELPER];
     const responseLib = container[BOTTLE_NAMES.LIB_RESPONSE];
     const userStateBagService = container[BOTTLE_NAMES.SERVICE_USER_STATE_BAG];
 
@@ -15,7 +16,10 @@ export function BOTTLE_FACTORY(container) {
         CONSTANTS,
         handler: async (event, context, callback) => {
             try {
-                const userStateBag = await userStateBagService.readUserState(event);
+                const httpBody = lambdaEnvironmentHelper.getHTTPBody(event);
+                const userId = lambdaEnvironmentHelper.getCognitoIdentityId(event);
+
+                const userStateBag = await userStateBagService.readUserState(userId);
                 callback(null, responseLib.success(userStateBag));
             } catch (e) {
                 logger.createAndLogWrappedError(
