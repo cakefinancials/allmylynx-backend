@@ -20,6 +20,43 @@ describe("user_state_bag", () => {
         userStateBagService = bottle.container[BOTTLE_NAMES.SERVICE_USER_STATE_BAG];
     };
 
+    describe("verifyPreviousStateEqualsCurrentState", () => {
+        describe("when the states are equal", () => {
+            before(() => {
+                buildUserStateBagTestBottle();
+            });
+
+            it("should have no side effects", () => {
+                const previousState = { some: 'state' };
+                const currentState = { some: 'state' };
+                expect(
+                    () => userStateBagService.verifyPreviousStateEqualsCurrentState(
+                        previousState,
+                        currentState
+                    )
+                ).to.not.throw();
+            });
+        });
+
+        describe("when the states are not equal", () => {
+            before(() => {
+                buildUserStateBagTestBottle();
+            });
+
+            it("should throw", () => {
+                const previousState = { some: 'state' };
+                const currentState = { some: 'state', oh: 'no' };
+
+                expect(
+                    () => userStateBagService.verifyPreviousStateEqualsCurrentState(
+                        previousState,
+                        currentState
+                    )
+                ).to.throw(userStateBagService.CONSTANTS.VERIFY_PREVIOUS_EQUALS_CURRENT_FAILURE_MESSAGE);
+            });
+        });
+    });
+
     describe("writeUserState", () => {
         describe("when the save succeeds", () => {
             before(() => {
