@@ -118,6 +118,12 @@ export function wrapLambdaFunction(lambdaFn) {
     const {rollbar} = bottle.container[BOTTLE_NAMES.LIB_LOGGER];
 
     return rollbar.lambdaHandler((event, context, callback) => {
+          /** Immediate response for WarmUP plugin */
+        if (event.source === 'serverless-plugin-warmup') {
+            console.log('WarmUP - Lambda is warm!')
+            return callback(null, 'Lambda is warm!')
+        }
+
         return lambdaFn(event, context, bottle.container, callback);
     });
 };
@@ -128,7 +134,15 @@ export function exportLambdaFunctions(lambdaFnBottleNamePairs) {
 
     const handlerExports = {};
     lambdaFnBottleNamePairs.forEach(([lambdaFnName, bottleName]) => {
-        handlerExports[lambdaFnName] = rollbar.lambdaHandler(bottle.container[bottleName].handler);
+        handlerExports[lambdaFnName] = rollbar.lambdaHandler((event, context, callback) => {
+              /** Immediate response for WarmUP plugin */
+            if (event.source === 'serverless-plugin-warmup') {
+                console.log('WarmUP - Lambda is warm!')
+                return callback(null, 'Lambda is warm!')
+            }
+
+            return bottle.container[bottleName].handler(event, context, callback);
+        });
     });
 
     return handlerExports;

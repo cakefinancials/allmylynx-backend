@@ -3,11 +3,15 @@ service: cake-financials-app-api
 # Use serverless-webpack plugin to transpile ES6/ES7
 plugins:
   - serverless-webpack
+  - serverless-plugin-warmup
 
 # Configuration for serverless-webpack
 # Enable auto-packing of external modules
 custom:
   myStage: ${opt:stage, self:provider.stage}
+  warmup_enabled:
+    dev: false
+    prod: true
   webpack:
     webpackConfig: ./webpack.config.js
     includeModules: true
@@ -15,7 +19,7 @@ custom:
 provider:
   name: aws
   runtime: nodejs8.10
-  stage: prod
+  stage: dev
   region: us-east-2
   profile: cake-financials
   environment:
@@ -24,6 +28,10 @@ provider:
     ROLLBAR_ACCESS_TOKEN: ${s3:cake-financials-config/ROLLBAR_ACCESS_TOKEN}
 
   iamRoleStatements:
+    - Effect: 'Allow'
+      Action:
+        - 'lambda:InvokeFunction'
+      Resource: "*"
     - Effect: Allow
       Action:
         - s3:*
@@ -40,6 +48,7 @@ provider:
 functions:
   save_user_email_identity_link:
     handler: server/functions/save_user_email_identity_link.main
+    warmup: ${self:custom.warmup_enabled.${self:custom.myStage}}
     environment:
       CAKE_USER_POOL_ID: ${s3:cake-financials-config/CAKE_USER_POOL_ID}
       USER_DATA_BUCKET: ${s3:cake-financials-config/USER_DATA_BUCKET}
@@ -52,6 +61,7 @@ functions:
 
   save_brokerage_creds:
     handler: server/functions/save_brokerage_credentials.main
+    warmup: ${self:custom.warmup_enabled.${self:custom.myStage}}
     environment:
       USER_DATA_PUBLIC_KEY: ${s3:cake-financials-config/USER_DATA_PUBLIC_KEY}
       USER_DATA_BUCKET: ${s3:cake-financials-config/USER_DATA_BUCKET}
@@ -64,6 +74,7 @@ functions:
 
   get_brokerage_creds_exists:
     handler: server/functions/get_brokerage_credentials_exists.main
+    warmup: ${self:custom.warmup_enabled.${self:custom.myStage}}
     environment:
       USER_DATA_BUCKET: ${s3:cake-financials-config/USER_DATA_BUCKET}
     events:
@@ -75,6 +86,7 @@ functions:
 
   get_obf_brokerage_creds:
     handler: server/functions/get_obfuscated_brokerage_credentials.main
+    warmup: ${self:custom.warmup_enabled.${self:custom.myStage}}
     environment:
       USER_DATA_BUCKET: ${s3:cake-financials-config/USER_DATA_BUCKET}
     events:
@@ -86,6 +98,7 @@ functions:
 
   save_bank_info:
     handler: server/functions/save_bank_info.main
+    warmup: ${self:custom.warmup_enabled.${self:custom.myStage}}
     environment:
       USER_DATA_PUBLIC_KEY: ${s3:cake-financials-config/USER_DATA_PUBLIC_KEY}
       USER_DATA_BUCKET: ${s3:cake-financials-config/USER_DATA_BUCKET}
@@ -98,6 +111,7 @@ functions:
 
   get_bank_info_exists:
     handler: server/functions/get_bank_info_exists.main
+    warmup: ${self:custom.warmup_enabled.${self:custom.myStage}}
     environment:
       USER_DATA_BUCKET: ${s3:cake-financials-config/USER_DATA_BUCKET}
     events:
@@ -109,6 +123,7 @@ functions:
 
   get_obf_bank_info:
     handler: server/functions/get_obfuscated_bank_info.main
+    warmup: ${self:custom.warmup_enabled.${self:custom.myStage}}
     environment:
       USER_DATA_BUCKET: ${s3:cake-financials-config/USER_DATA_BUCKET}
     events:
@@ -120,6 +135,7 @@ functions:
 
   get_user_state_bag:
     handler: server/functions/entry_points.get_user_state_bag
+    warmup: ${self:custom.warmup_enabled.${self:custom.myStage}}
     environment:
       USER_DATA_BUCKET: ${s3:cake-financials-config/USER_DATA_BUCKET}
     events:
@@ -131,6 +147,7 @@ functions:
 
   save_user_state_bag:
     handler: server/functions/entry_points.save_user_state_bag
+    warmup: ${self:custom.warmup_enabled.${self:custom.myStage}}
     environment:
       USER_DATA_BUCKET: ${s3:cake-financials-config/USER_DATA_BUCKET}
     events:
