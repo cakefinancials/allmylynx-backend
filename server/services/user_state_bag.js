@@ -17,7 +17,6 @@ export function BOTTLE_FACTORY(container) {
     const envLib = container[BOTTLE_NAMES.CLIENT_ENV];
     const logger = container[BOTTLE_NAMES.LIB_LOGGER]
         .getContextualLogger("service.user_state_bag");
-    const NestedError = container[BOTTLE_NAMES.EXTERN_NESTED_ERROR];
     const s3KeyGeneratorService = container[BOTTLE_NAMES.SERVICE_S3_KEY_GENERATOR];
 
     const CONSTANTS = {

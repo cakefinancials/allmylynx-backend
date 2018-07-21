@@ -6,7 +6,13 @@ export function BOTTLE_FACTORY(container) {
         getUserStateBagKey: (userId) => {
             const userStateBagKey = `${userId}/user_state_bag.json`;
             return userStateBagKey;
+        },
+
+        getUserDashboardDataKey: (userEmail) => {
+            const userDashboardDataKey = `${userEmail}/dashboard-data.json`;
+            return userDashboardDataKey;
         }
+
     };
 
     return SERVICE;

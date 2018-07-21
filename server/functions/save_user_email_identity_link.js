@@ -1,53 +1,25 @@
-import { BOTTLE_NAMES, wrapLambdaFunction } from "../libs/bottle";
+import { BOTTLE_NAMES, wrapLambdaFunction } from '../libs/bottle';
 
 export const CONSTANTS = {
-    UNRECOGNIZED_IDENTITY_PROVIDER_FAILURE_MESSAGE: "Unrecognized identity provider",
-    NO_MATCHING_USERS_FAILURE_MESSAGE: "Could not find any matching users",
-    COGNITO_LIST_USERS_FAILURE_MESSAGE: "Error while requesting user info from cognito",
-    SAVE_COGNITO_LINK_FAILURE_MESSAGE: "Error while saving email to cognito id link"
+    GET_USER_EMAIL_ERROR: 'GetUserEmailError',
+    GET_USER_EMAIL_ERROR_MESSAGE: 'Failure while trying to resolve the user\'s email',
+    SAVE_COGNITO_LINK_FAILURE_MESSAGE: 'Error while saving email to cognito id link'
 };
 
 export const handler = async function (event, context, container, callback) {
     const awsLib = container[BOTTLE_NAMES.CLIENT_AWS];
+    const cognitoHelperService = container[BOTTLE_NAMES.SERVICE_COGNITO_HELPER];
     const envLib = container[BOTTLE_NAMES.CLIENT_ENV];
     const responseLib = container[BOTTLE_NAMES.LIB_RESPONSE];
     const helperLib = container[BOTTLE_NAMES.LIB_HELPER];
     const logger = container[BOTTLE_NAMES.LIB_LOGGER]
-        .getContextualLogger("save_user_email_identity_link.handler");
-
-    const CAKE_USER_POOL_ID = envLib.getEnvVar("CAKE_USER_POOL_ID");
-    const cognitoAuthenticationProvider = event.requestContext.identity.cognitoAuthenticationProvider;
-    if (!cognitoAuthenticationProvider.includes(CAKE_USER_POOL_ID)) {
-        logger.error(CONSTANTS.UNRECOGNIZED_IDENTITY_PROVIDER_FAILURE_MESSAGE);
-        callback(null, responseLib.failure({ error: CONSTANTS.UNRECOGNIZED_IDENTITY_PROVIDER_FAILURE_MESSAGE}));
-        return;
-    }
-
-    const sub = cognitoAuthenticationProvider.split(":").slice(-1).pop();
-    const Filter = `sub=\"${sub}\"`;
-    const idpParams = {
-        UserPoolId: CAKE_USER_POOL_ID,
-        AttributesToGet: [
-            "sub",
-            "email"
-        ],
-        Filter
-    };
+        .getContextualLogger('save_user_email_identity_link.handler');
 
     let email;
     try {
-        const response = await awsLib.cognitoIdentityServiceProviderCall("listUsers", idpParams);
-        const users = response["Users"];
-        if (users.length === 0) {
-            logger.error(CONSTANTS.NO_MATCHING_USERS_FAILURE_MESSAGE);
-            callback(null, responseLib.failure({ error: CONSTANTS.NO_MATCHING_USERS_FAILURE_MESSAGE }));
-            return;
-        }
-
-        email = (users[0]["Attributes"].find(({Name}) => Name === "email"))["Value"];
-    } catch (e) {
-        logger.error(CONSTANTS.COGNITO_LIST_USERS_FAILURE_MESSAGE, e);
-        callback(null, responseLib.failure({ error: CONSTANTS.COGNITO_LIST_USERS_FAILURE_MESSAGE }));
+        email = await cognitoHelperService.getUserEmailFromLambdaEvent(event);
+    } catch (err) {
+        callback(null, responseLib.failure({ error: CONSTANTS.GET_USER_EMAIL_FAILURE }));
         return;
     }
 
@@ -55,17 +27,17 @@ export const handler = async function (event, context, container, callback) {
 
     const userEmailIdentityLink = `email_to_cognito_id/${email}/${cognitoId}`;
 
-    const USER_DATA_BUCKET = envLib.getEnvVar("USER_DATA_BUCKET");
+    const USER_DATA_BUCKET = envLib.getEnvVar('USER_DATA_BUCKET');
     const createLinkPromise = awsLib.s3PutObject(
         USER_DATA_BUCKET,
         userEmailIdentityLink,
-        ""
+        ''
     );
 
-    const results = await helperLib.executeAllPromises([createLinkPromise]);
+    const results = await helperLib.executeAllPromises([ createLinkPromise ]);
 
     if (results.errors.length > 0) {
-        logger.error(CONSTANTS.SAVE_COGNITO_LINK_FAILURE_MESSAGE, {errors: results.errors});
+        logger.error(CONSTANTS.SAVE_COGNITO_LINK_FAILURE_MESSAGE, { errors: results.errors });
         callback(null, responseLib.failure({ error: CONSTANTS.SAVE_COGNITO_LINK_FAILURE_MESSAGE }));
     } else {
         callback(null, responseLib.success({ success: true }));
