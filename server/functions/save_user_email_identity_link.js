@@ -1,7 +1,6 @@
 import { BOTTLE_NAMES, wrapLambdaFunction } from '../libs/bottle';
 
 export const CONSTANTS = {
-    GET_USER_EMAIL_ERROR: 'GetUserEmailError',
     GET_USER_EMAIL_ERROR_MESSAGE: 'Failure while trying to resolve the user\'s email',
     SAVE_COGNITO_LINK_FAILURE_MESSAGE: 'Error while saving email to cognito id link'
 };

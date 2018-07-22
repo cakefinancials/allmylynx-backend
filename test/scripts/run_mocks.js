@@ -38,6 +38,10 @@ const tests = [
         fnName: "get_user_state_bag",
         mock: "get_user_state_bag-event.json",
     },
+    {
+        fnName: "get_user_dashboard_data",
+        mock: "get_user_dashboard_data-event.json",
+    },
 ];
 
 console.log('CLEANING OUT S3 BUCKET FOR "USER-SUB-1234"');

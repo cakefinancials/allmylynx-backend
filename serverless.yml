@@ -156,3 +156,17 @@ functions:
           method: post
           cors: true
           authorizer: aws_iam
+
+  get_user_dashboard_data:
+    handler: server/functions/entry_points.get_user_dashboard_data
+    warmup: ${self:custom.warmup_enabled.${self:custom.myStage}}
+    environment:
+      CAKE_USER_POOL_ID: ${s3:cake-financials-config/CAKE_USER_POOL_ID}
+      USER_DASHBOARD_DATA_BUCKET: ${s3:cake-financials-config/USER_DASHBOARD_DATA_BUCKET}
+      USER_DASHBOARD_DATA_BUCKET_REGION: ${s3:cake-financials-config/USER_DASHBOARD_DATA_BUCKET_REGION}
+    events:
+      - http:
+          path: user/dashboard_data
+          method: get
+          cors: true
+          authorizer: aws_iam

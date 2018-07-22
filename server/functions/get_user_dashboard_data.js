@@ -1,35 +1,35 @@
 export function BOTTLE_FACTORY(container) {
     const BOTTLE_NAMES = container.BOTTLE_NAMES;
-    const logger = container[BOTTLE_NAMES.LIB_LOGGER]
-        .getContextualLogger("get_user_dashboard_data.handler");
 
-    const lambdaEnvironmentHelper = container[BOTTLE_NAMES.SERVICE_LAMBDA_ENVIRONMENT_HELPER];
+    const cognitoHelperService = container[BOTTLE_NAMES.SERVICE_COGNITO_HELPER];
+    const userDashboardDataService = container[BOTTLE_NAMES.SERVICE_USER_DASHBOARD_DATA];
     const responseLib = container[BOTTLE_NAMES.LIB_RESPONSE];
-    const userStateBagService = container[BOTTLE_NAMES.SERVICE_USER_STATE_BAG];
 
     const CONSTANTS = {
-        FAILURE_MESSAGE: "Failed to retrieve the state bag for the user",
-        GET_USER_STATE_BAG_ERROR: "GetUserStateBagError"
+        GET_USER_EMAIL_ERROR_MESSAGE: 'Failure while trying to resolve the user\'s email',
+        GET_USER_DASHBOARD_DATA_FETCH_ERROR_MESSAGE: 'Failure while trying to fetch the user\'s dashboard data',
     };
 
     const SERVICE = {
         CONSTANTS,
         handler: async (event, context, callback) => {
+            let email;
             try {
-                const httpBody = lambdaEnvironmentHelper.getHTTPBody(event);
-                const userId = lambdaEnvironmentHelper.getCognitoIdentityId(event);
-
-                const userStateBag = await userStateBagService.readUserState(userId);
-                callback(null, responseLib.success(userStateBag));
-            } catch (e) {
-                logger.createAndLogWrappedError(
-                    CONSTANTS.GET_USER_STATE_BAG_ERROR,
-                    CONSTANTS.FAILURE_MESSAGE,
-                    e,
-                    { event, context }
-                );
-                callback(null, responseLib.failure({ error: CONSTANTS.FAILURE_MESSAGE }));
+                email = await cognitoHelperService.getUserEmailFromLambdaEvent(event);
+            } catch (err) {
+                callback(null, responseLib.failure({ error: CONSTANTS.GET_USER_EMAIL_ERROR_MESSAGE }));
+                return;
             }
+
+            let dashboardData;
+            try {
+                dashboardData = await userDashboardDataService.getUserDashboardData(email);
+            } catch (err) {
+                callback(null, responseLib.failure({ error: CONSTANTS.GET_USER_DASHBOARD_DATA_FETCH_ERROR_MESSAGE }));
+                return;
+            }
+
+            callback(null, responseLib.success(dashboardData));
         }
     };
 
