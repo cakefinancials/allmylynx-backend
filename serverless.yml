@@ -42,6 +42,14 @@ provider:
       Resource: "arn:aws:s3:::cake-financials-user-data"
     - Effect: Allow
       Action:
+        - s3:*
+      Resource: "arn:aws:s3:::cake-financials-zapier-dump/*"
+    - Effect: Allow
+      Action:
+        - s3:*
+      Resource: "arn:aws:s3:::cake-financials-zapier-dump"
+    - Effect: Allow
+      Action:
         - cognito-idp:ListUsers
       Resource: "arn:aws:cognito-idp:us-east-2:951721516169:userpool/us-east-2_9v5RltuvI"
 
