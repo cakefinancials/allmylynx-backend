@@ -8,16 +8,16 @@ export function BOTTLE_FACTORY(container) {
     const R = container[BOTTLE_NAMES.EXTERN_RAMDA];
     const Rollbar = container[BOTTLE_NAMES.EXTERN_ROLLBAR];
 
-    const ROLLBAR_ACCESS_TOKEN = envLib.getEnvVar("ROLLBAR_ACCESS_TOKEN");
-    const stage = envLib.getEnvVar("MY_STAGE");
+    const ROLLBAR_ACCESS_TOKEN = envLib.getEnvVar('ROLLBAR_ACCESS_TOKEN');
+    const stage = envLib.getEnvVar('MY_STAGE');
 
     const rollbar = new Rollbar({
         accessToken: ROLLBAR_ACCESS_TOKEN,
         captureUncaught: true,
         captureUnhandledRejections: true,
-        enabled: stage !== "test",
+        enabled: stage !== 'test',
         environment: stage,
-        reportLevel: "warning", // same as default for now
+        reportLevel: 'warning', // same as default for now
         verbose: true,
     });
 
@@ -35,12 +35,12 @@ export function BOTTLE_FACTORY(container) {
     return {
         getContextualLogger: (name) => {
             const rollbarFns = [
-                "log",
-                "debug",
-                "info",
-                "warning",
-                "error",
-                "critical",
+                'log',
+                'debug',
+                'info',
+                'warning',
+                'error',
+                'critical',
             ];
 
             const contextualRollbar = { createWrappedError };
@@ -54,11 +54,11 @@ export function BOTTLE_FACTORY(container) {
 
                     const message = R.head(strOptions);
 
-                    const contextualMessage = R.isNil(message) ? name : [name, message].join(': ');
+                    const contextualMessage = R.isNil(message) ? name : [ name, message ].join(': ');
 
                     rollbar[fnName](contextualMessage, ...options);
 
-                    console.log({level: fnName, message: contextualMessage, nonStrOptions});
+                    console.log({ level: fnName, message: contextualMessage, nonStrOptions });
                 };
             }, rollbarFns);
 

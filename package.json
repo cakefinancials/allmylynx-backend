@@ -26,7 +26,7 @@
     "babel-preset-env": "1.6.1",
     "babel-preset-stage-3": "6.24.1",
     "chai": "4.1.2",
-    "chai-as-promised": "^7.1.1",
+    "chai-as-promised": "7.1.1",
     "mocha": "5.1.1",
     "serverless-plugin-warmup": "3.6.2-rc.1",
     "serverless-webpack": "5.1.1",
@@ -38,8 +38,9 @@
     "babel-runtime": "6.26.0",
     "bluebird": "3.5.1",
     "bottlejs": "1.7.0",
-    "nested-error-stacks": "^2.0.1",
+    "nested-error-stacks": "2.0.1",
     "openpgp": "2.6.2",
+    "plaid": "2.7.0",
     "ramda": "0.25.0",
     "rollbar": "2.3.9"
   }

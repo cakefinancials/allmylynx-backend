@@ -6,6 +6,7 @@ import Bottle from 'bottlejs';
 /* all of the node module dependencies */
 import AWS from 'aws-sdk';
 const NestedError = require('nested-error-stacks');
+import plaid from 'plaid';
 import Promise from 'bluebird';
 import R from 'ramda';
 import Rollbar from 'rollbar';
@@ -23,6 +24,8 @@ import { BOTTLE_FACTORY as pgpLibBF } from '../clients/pgp';
 
 import { BOTTLE_FACTORY as cognitoHelperServiceBF } from '../services/cognito_helper_service';
 import { BOTTLE_FACTORY as lambdaEnvironmentHelperBF } from '../services/lambda_environment_helper';
+import { BOTTLE_FACTORY as plaidAuthenticatorServiceBF } from '../services/plaid_authenticator_service';
+import { BOTTLE_FACTORY as plaidDataServiceBF } from '../services/plaid_data_service';
 import { BOTTLE_FACTORY as s3KeyGeneratorServiceBF } from '../services/s3_key_generator';
 import { BOTTLE_FACTORY as userDashboardDataServiceBF } from '../services/user_dashboard_data_service';
 import { BOTTLE_FACTORY as userStateBagServiceBF } from '../services/user_state_bag';
@@ -51,6 +54,8 @@ export const BOTTLE_NAMES = {
 
     SERVICE_COGNITO_HELPER: 'service|cognito_helper',
     SERVICE_LAMBDA_ENVIRONMENT_HELPER: 'service|lambda_environment_helper',
+    SERVICE_PLAID_AUTHENTICATOR: 'service|plaid_authenticator',
+    SERVICE_PLAID_DATA_SERVICE: 'service|plaid_data_service',
     SERVICE_S3_KEY_GENERATOR: 'service|s3_key_generator',
     SERVICE_USER_DASHBOARD_DATA: 'service|user_dashboard_data',
     SERVICE_USER_STATE_BAG: 'service|user_state_bag',
@@ -95,6 +100,16 @@ function buildBottle(overrides = {}) {
         [BOTTLE_NAMES.EXTERN_BLUEBIRD]: () => Promise,
         [BOTTLE_NAMES.EXTERN_NESTED_ERROR]: () => NestedError,
         [BOTTLE_NAMES.EXTERN_OPENPGP]: () => openpgp,
+        [BOTTLE_NAMES.EXTERN_PLAID]: (container) => {
+            const envLib = container[BOTTLE_NAMES.CLIENT_ENV];
+
+            return plaid.createClient(
+                envLib.getEnvVar('PLAID_CLIENT_ID'),
+                envLib.getEnvVar('PLAID_SECRET_KEY'),
+                envLib.getEnvVar('PLAID_PUBLIC_KEY'),
+                envLib.getEnvVar('PLAID_ENVIRONMENT'),
+            );
+        },
         [BOTTLE_NAMES.EXTERN_RAMDA]: () => R,
         [BOTTLE_NAMES.EXTERN_ROLLBAR]: () => Rollbar,
 
@@ -108,6 +123,8 @@ function buildBottle(overrides = {}) {
 
         [BOTTLE_NAMES.SERVICE_COGNITO_HELPER]: cognitoHelperServiceBF,
         [BOTTLE_NAMES.SERVICE_LAMBDA_ENVIRONMENT_HELPER]: lambdaEnvironmentHelperBF,
+        [BOTTLE_NAMES.SERVICE_PLAID_AUTHENTICATOR]: plaidAuthenticatorServiceBF,
+        [BOTTLE_NAMES.SERVICE_PLAID_DATA_SERVICE]: plaidDataServiceBF,
         [BOTTLE_NAMES.SERVICE_S3_KEY_GENERATOR]: s3KeyGeneratorServiceBF,
         [BOTTLE_NAMES.SERVICE_USER_DASHBOARD_DATA]: userDashboardDataServiceBF,
         [BOTTLE_NAMES.SERVICE_USER_STATE_BAG]: userStateBagServiceBF,
