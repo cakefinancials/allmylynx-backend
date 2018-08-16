@@ -32,6 +32,7 @@ import { BOTTLE_FACTORY as userStateBagServiceBF } from '../services/user_state_
 
 import { BOTTLE_FACTORY as getUserStateBagBF } from '../functions/get_user_state_bag';
 import { BOTTLE_FACTORY as getUserDashboardDataBF } from '../functions/get_user_dashboard_data';
+import { BOTTLE_FACTORY as saveUserPlaidDataBF } from '../functions/save_user_plaid_data';
 import { BOTTLE_FACTORY as saveUserStateBagBF } from '../functions/save_user_state_bag';
 
 export const BOTTLE_NAMES = {
@@ -55,13 +56,14 @@ export const BOTTLE_NAMES = {
     SERVICE_COGNITO_HELPER: 'service|cognito_helper',
     SERVICE_LAMBDA_ENVIRONMENT_HELPER: 'service|lambda_environment_helper',
     SERVICE_PLAID_AUTHENTICATOR: 'service|plaid_authenticator',
-    SERVICE_PLAID_DATA_SERVICE: 'service|plaid_data_service',
+    SERVICE_PLAID_DATA: 'service|plaid_data_service',
     SERVICE_S3_KEY_GENERATOR: 'service|s3_key_generator',
     SERVICE_USER_DASHBOARD_DATA: 'service|user_dashboard_data',
     SERVICE_USER_STATE_BAG: 'service|user_state_bag',
 
     FUNCTION_GET_USER_STATE_BAG: 'function|get_user_state_bag',
     FUNCTION_GET_USER_DASHBOARD_DATA: 'function|get_user_dashboard_data',
+    FUNCTION_SAVE_USER_PLAID_DATA: 'function|save_user_plaid_data',
     FUNCTION_SAVE_USER_STATE_BAG: 'function|save_user_state_bag',
 };
 
@@ -124,13 +126,14 @@ function buildBottle(overrides = {}) {
         [BOTTLE_NAMES.SERVICE_COGNITO_HELPER]: cognitoHelperServiceBF,
         [BOTTLE_NAMES.SERVICE_LAMBDA_ENVIRONMENT_HELPER]: lambdaEnvironmentHelperBF,
         [BOTTLE_NAMES.SERVICE_PLAID_AUTHENTICATOR]: plaidAuthenticatorServiceBF,
-        [BOTTLE_NAMES.SERVICE_PLAID_DATA_SERVICE]: plaidDataServiceBF,
+        [BOTTLE_NAMES.SERVICE_PLAID_DATA]: plaidDataServiceBF,
         [BOTTLE_NAMES.SERVICE_S3_KEY_GENERATOR]: s3KeyGeneratorServiceBF,
         [BOTTLE_NAMES.SERVICE_USER_DASHBOARD_DATA]: userDashboardDataServiceBF,
         [BOTTLE_NAMES.SERVICE_USER_STATE_BAG]: userStateBagServiceBF,
 
         [BOTTLE_NAMES.FUNCTION_GET_USER_STATE_BAG]: getUserStateBagBF,
         [BOTTLE_NAMES.FUNCTION_GET_USER_DASHBOARD_DATA]: getUserDashboardDataBF,
+        [BOTTLE_NAMES.FUNCTION_SAVE_USER_PLAID_DATA]: saveUserPlaidDataBF,
         [BOTTLE_NAMES.FUNCTION_SAVE_USER_STATE_BAG]: saveUserStateBagBF,
     }, DEFAULT_BOTTLE_OVERRIDES, overrides ]);
 

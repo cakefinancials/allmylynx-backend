@@ -3,44 +3,44 @@ const execSync = require('child_process').execSync;
 // Have to run tests in some order :(
 const tests = [
     {
-        fnName: "save_user_email_identity_link",
-        mock: "save_user_email_identity_link-event.json",
+        fnName: 'save_user_email_identity_link',
+        mock: 'save_user_email_identity_link-event.json',
     },
     {
-        fnName: "save_brokerage_creds",
-        mock: "save_brokerage_credentials-event.json",
+        fnName: 'save_brokerage_creds',
+        mock: 'save_brokerage_credentials-event.json',
     },
     {
-        fnName: "save_bank_info",
-        mock: "save_bank_info-event.json",
+        fnName: 'save_bank_info',
+        mock: 'save_bank_info-event.json',
     },
     {
-        fnName: "get_bank_info_exists",
-        mock: "get_bank_info_exists-event.json",
+        fnName: 'get_bank_info_exists',
+        mock: 'get_bank_info_exists-event.json',
     },
     {
-        fnName: "get_brokerage_creds_exists",
-        mock: "get_brokerage_credentials_exists-event.json",
+        fnName: 'get_brokerage_creds_exists',
+        mock: 'get_brokerage_credentials_exists-event.json',
     },
     {
-        fnName: "get_obf_bank_info",
-        mock: "get_obfuscated_bank_info-event.json",
+        fnName: 'get_obf_bank_info',
+        mock: 'get_obfuscated_bank_info-event.json',
     },
     {
-        fnName: "get_obf_brokerage_creds",
-        mock: "get_obfuscated_brokerage_credentials-event.json",
+        fnName: 'get_obf_brokerage_creds',
+        mock: 'get_obfuscated_brokerage_credentials-event.json',
     },
     {
-        fnName: "save_user_state_bag",
-        mock: "save_user_state_bag-event.json",
+        fnName: 'save_user_state_bag',
+        mock: 'save_user_state_bag-event.json',
     },
     {
-        fnName: "get_user_state_bag",
-        mock: "get_user_state_bag-event.json",
+        fnName: 'get_user_state_bag',
+        mock: 'get_user_state_bag-event.json',
     },
     {
-        fnName: "get_user_dashboard_data",
-        mock: "get_user_dashboard_data-event.json",
+        fnName: 'get_user_dashboard_data',
+        mock: 'get_user_dashboard_data-event.json',
     },
 ];
 

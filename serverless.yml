@@ -178,3 +178,19 @@ functions:
           method: get
           cors: true
           authorizer: aws_iam
+
+  save_user_plaid_data:
+    handler: server/functions/entry_points.save_user_plaid_data
+    warmup: ${self:custom.warmup_enabled.${self:custom.myStage}}
+    environment:
+      USER_DATA_BUCKET: ${s3:cake-financials-config/USER_DATA_BUCKET}
+      PLAID_CLIENT_ID: ${s3:cake-financials-config/PLAID_CLIENT_ID}
+      PLAID_PUBLIC_KEY: ${s3:cake-financials-config/PLAID_PUBLIC_KEY}
+      PLAID_SECRET_KEY: ${s3:cake-financials-config/${self:custom.myStage}/PLAID_SECRET_KEY}
+      PLAID_ENVIRONMENT: ${s3:cake-financials-config/${self:custom.myStage}/PLAID_ENVIRONMENT}
+    events:
+      - http:
+          path: user/plaid_data
+          method: post
+          cors: true
+          authorizer: aws_iam

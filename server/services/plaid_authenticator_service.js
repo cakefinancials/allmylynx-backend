@@ -20,7 +20,7 @@ export function BOTTLE_FACTORY(container) {
 
                 plaidAccessToken = response.access_token;
             } catch (err) {
-                logger.createAndLogWrappedError(
+                throw logger.createAndLogWrappedError(
                     CONSTANTS.PLAID_EXCHANGE_PUBLIC_TOKEN_ERROR,
                     CONSTANTS.PLAID_EXCHANGE_PUBLIC_TOKEN_ERROR_MESSAGE,
                     err,
@@ -33,7 +33,7 @@ export function BOTTLE_FACTORY(container) {
                 const response = await plaidClient.createStripeToken(plaidAccessToken, plaidAccountId);
                 bankAccountToken = response.stripe_bank_account_token;
             } catch (err) {
-                logger.createAndLogWrappedError(
+                throw logger.createAndLogWrappedError(
                     CONSTANTS.STRIPE_TOKEN_EXCHANGE_ERROR,
                     CONSTANTS.STRIPE_TOKEN_EXCHANGE_ERROR_MESSAGE,
                     err,
