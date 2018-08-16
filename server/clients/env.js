@@ -4,7 +4,7 @@ export function BOTTLE_FACTORY(container) {
 
     const SERVICE = {
         getEnvVar: (name) => {
-            return R.path([name], process.env);
+            return R.path([ name ], process.env);
         }
     };
 
