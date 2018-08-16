@@ -13,10 +13,11 @@ export function BOTTLE_FACTORY(container) {
     };
 
     const SERVICE = {
+        CONSTANTS,
         getStripeBankToken: async ({ plaidAccountId, plaidPublicToken }) => {
             let plaidAccessToken;
             try {
-                const response = plaidClient.exchangePublicToken(plaidPublicToken);
+                const response = await plaidClient.exchangePublicToken(plaidPublicToken);
 
                 plaidAccessToken = response.access_token;
             } catch (err) {
