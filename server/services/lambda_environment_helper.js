@@ -7,7 +7,7 @@ export function BOTTLE_FACTORY(container) {
 
     const SERVICE = {
         getCognitoIdentityId: (lambdaEvent) => {
-            const userId = R.path(['requestContext', 'identity', 'cognitoIdentityId'], lambdaEvent);
+            const userId = R.path([ 'requestContext', 'identity', 'cognitoIdentityId' ], lambdaEvent);
 
             return userId;
         },

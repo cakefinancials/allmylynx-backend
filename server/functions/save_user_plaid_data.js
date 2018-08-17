@@ -21,7 +21,7 @@ export function BOTTLE_FACTORY(container) {
                 const httpBody = lambdaEnvironmentHelper.getHTTPBody(event);
                 const { plaidPublicToken, plaidAccountId } = httpBody;
 
-                const { bankAccountToken, plaidAccessToken } = plaidAuthenticatorService.getStripeBankToken(
+                const { bankAccountToken, plaidAccessToken } = await plaidAuthenticatorService.getStripeBankToken(
                     { plaidPublicToken, plaidAccountId }
                 );
 
