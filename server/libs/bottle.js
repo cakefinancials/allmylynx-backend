@@ -105,7 +105,7 @@ function buildBottle(overrides = {}) {
         [BOTTLE_NAMES.EXTERN_PLAID]: (container) => {
             const envLib = container[BOTTLE_NAMES.CLIENT_ENV];
 
-            return plaid.createClient(
+            return new plaid.Client(
                 envLib.getEnvVar('PLAID_CLIENT_ID'),
                 envLib.getEnvVar('PLAID_SECRET_KEY'),
                 envLib.getEnvVar('PLAID_PUBLIC_KEY'),
