@@ -6,7 +6,7 @@ import util from 'util';
 import { BOTTLE_NAMES, testBottleBuilderFactory } from '../../../server/libs/bottle';
 const buildTestBottle = testBottleBuilderFactory();
 
-describe.only('save_user_plaid_data_test', () => {
+describe('save_user_plaid_data_test', () => {
     let saveUserPlaidDataService;
 
     const event = 'some_event';
