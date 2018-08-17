@@ -109,7 +109,7 @@ function buildBottle(overrides = {}) {
                 envLib.getEnvVar('PLAID_CLIENT_ID'),
                 envLib.getEnvVar('PLAID_SECRET_KEY'),
                 envLib.getEnvVar('PLAID_PUBLIC_KEY'),
-                envLib.getEnvVar('PLAID_ENVIRONMENT'),
+                plaid.environments[envLib.getEnvVar('PLAID_ENVIRONMENT')],
             );
         },
         [BOTTLE_NAMES.EXTERN_RAMDA]: () => R,
