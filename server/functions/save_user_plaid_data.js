@@ -21,12 +21,16 @@ export function BOTTLE_FACTORY(container) {
                 const httpBody = lambdaEnvironmentHelper.getHTTPBody(event);
                 const { plaidPublicToken, plaidAccountId } = httpBody;
 
-                const { bankAccountToken, plaidAccessToken } = await plaidAuthenticatorService.getStripeBankToken(
+                const { plaidAccessToken } = await plaidAuthenticatorService.getPlaidAccessToken(
                     { plaidPublicToken, plaidAccountId }
                 );
 
+                const { institutionName } = await plaidAuthenticatorService.getPlaidInstitutionName(
+                    { plaidAccessToken }
+                );
+
                 const userId = lambdaEnvironmentHelper.getCognitoIdentityId(event);
-                const plaidAccountData = { bankAccountToken, plaidAccessToken, plaidPublicToken, plaidAccountId };
+                const plaidAccountData = { plaidAccessToken, plaidPublicToken, plaidAccountId, institutionName };
 
                 const writeResponse = await plaidDataService.writePlaidData({ userId, plaidAccountData });
                 callback(null, responseLib.success(writeResponse));

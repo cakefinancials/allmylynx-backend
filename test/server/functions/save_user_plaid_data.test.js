@@ -14,8 +14,8 @@ describe('save_user_plaid_data_test', () => {
     const userId = 'some_user_id';
     const plaidPublicToken = 'some_public_token';
     const plaidAccountId = 'some_plaid_account_id';
-    const bankAccountToken = 'some_bank_account_token';
     const plaidAccessToken = 'some_plaid_access_token';
+    const institutionName = 'some_plaid_institution';
     const plaidDataWriteResponse = 'some_plaid_data_write_response';
 
     const setupTests = (overrides = {}) => {
@@ -34,7 +34,8 @@ describe('save_user_plaid_data_test', () => {
                     getCognitoIdentityId: simple.stub().returnWith(userId)
                 },
                 [BOTTLE_NAMES.SERVICE_PLAID_AUTHENTICATOR]: {
-                    getStripeBankToken: simple.stub().returnWith({ bankAccountToken, plaidAccessToken })
+                    getPlaidAccessToken: simple.stub().returnWith({ plaidAccessToken }),
+                    getPlaidInstitutionName: simple.stub().returnWith({ institutionName }),
                 },
                 [BOTTLE_NAMES.SERVICE_PLAID_DATA]: {
                     writePlaidData: simple.stub().resolveWith(plaidDataWriteResponse)
@@ -54,11 +55,11 @@ describe('save_user_plaid_data_test', () => {
         let container;
 
         describe('when there is some error thrown during execution', () => {
-            const bankTokenError = new Error('SOMETHING');
+            const someError = new Error('SOMETHING');
             before(() => {
                 container = setupTests({
                     [BOTTLE_NAMES.SERVICE_PLAID_AUTHENTICATOR]: {
-                        getStripeBankToken: simple.stub().rejectWith(bankTokenError)
+                        getPlaidAccessToken: simple.stub().rejectWith(someError)
                     }
                 });
             });
@@ -75,7 +76,7 @@ describe('save_user_plaid_data_test', () => {
                 expect(container[BOTTLE_NAMES.LIB_LOGGER].createAndLogWrappedErrorStub.lastCall.args).to.deep.equal([
                     saveUserPlaidDataService.CONSTANTS.SAVE_USER_PLAID_DATA_ERROR,
                     saveUserPlaidDataService.CONSTANTS.FAILURE_MESSAGE,
-                    bankTokenError,
+                    someError,
                     { event, context }
                 ]);
             });
@@ -99,7 +100,7 @@ describe('save_user_plaid_data_test', () => {
                     event
                 ]);
 
-                expect(container[BOTTLE_NAMES.SERVICE_PLAID_AUTHENTICATOR].getStripeBankToken.lastCall.args).to.deep.equal([
+                expect(container[BOTTLE_NAMES.SERVICE_PLAID_AUTHENTICATOR].getPlaidAccessToken.lastCall.args).to.deep.equal([
                     { plaidPublicToken, plaidAccountId }
                 ]);
 
@@ -111,7 +112,7 @@ describe('save_user_plaid_data_test', () => {
                     {
                         userId,
                         plaidAccountData: {
-                            bankAccountToken, plaidAccessToken, plaidPublicToken, plaidAccountId
+                            plaidAccessToken, plaidPublicToken, plaidAccountId, institutionName
                         }
                     }
                 ]);
