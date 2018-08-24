@@ -11,20 +11,12 @@ const tests = [
         mock: 'save_brokerage_credentials-event.json',
     },
     {
-        fnName: 'save_bank_info',
-        mock: 'save_bank_info-event.json',
-    },
-    {
         fnName: 'get_bank_info_exists',
         mock: 'get_bank_info_exists-event.json',
     },
     {
         fnName: 'get_brokerage_creds_exists',
         mock: 'get_brokerage_credentials_exists-event.json',
-    },
-    {
-        fnName: 'get_obf_bank_info',
-        mock: 'get_obfuscated_bank_info-event.json',
     },
     {
         fnName: 'get_obf_brokerage_creds',

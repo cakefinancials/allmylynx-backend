@@ -104,19 +104,6 @@ functions:
           cors: true
           authorizer: aws_iam
 
-  save_bank_info:
-    handler: server/functions/save_bank_info.main
-    warmup: ${self:custom.warmup_enabled.${self:custom.myStage}}
-    environment:
-      USER_DATA_PUBLIC_KEY: ${s3:cake-financials-config/USER_DATA_PUBLIC_KEY}
-      USER_DATA_BUCKET: ${s3:cake-financials-config/USER_DATA_BUCKET}
-    events:
-      - http:
-          path: bank/account_info
-          method: post
-          cors: true
-          authorizer: aws_iam
-
   get_bank_info_exists:
     handler: server/functions/get_bank_info_exists.main
     warmup: ${self:custom.warmup_enabled.${self:custom.myStage}}
@@ -125,18 +112,6 @@ functions:
     events:
       - http:
           path: bank/account_info/exists
-          method: get
-          cors: true
-          authorizer: aws_iam
-
-  get_obf_bank_info:
-    handler: server/functions/get_obfuscated_bank_info.main
-    warmup: ${self:custom.warmup_enabled.${self:custom.myStage}}
-    environment:
-      USER_DATA_BUCKET: ${s3:cake-financials-config/USER_DATA_BUCKET}
-    events:
-      - http:
-          path: bank/account_info/obfuscated
           method: get
           cors: true
           authorizer: aws_iam

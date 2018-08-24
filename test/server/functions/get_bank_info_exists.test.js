@@ -1,13 +1,13 @@
-import { expect } from "chai";
-import simple from "simple-mock";
-import Promise from "bluebird";
+import { expect } from 'chai';
+import simple from 'simple-mock';
+import Promise from 'bluebird';
 
-import { handler, CONSTANTS } from "../../../server/functions/get_bank_info_exists";
-import { getDefaultEvent, getDefaultContext } from "../../helpers/defaults";
+import { handler, CONSTANTS } from '../../../server/functions/get_bank_info_exists';
+import { getDefaultEvent, getDefaultContext } from '../../helpers/defaults';
 
-import { BOTTLE_NAMES, testBottleBuilderFactory } from "../../../server/libs/bottle";
+import { BOTTLE_NAMES, testBottleBuilderFactory } from '../../../server/libs/bottle';
 
-describe("get_bank_info_exists", () => {
+describe('get_bank_info_exists', () => {
     const handlerPromise = Promise.promisify(handler);
     const defaultEvent = getDefaultEvent();
     const defaultContext = getDefaultContext();
@@ -15,58 +15,59 @@ describe("get_bank_info_exists", () => {
     let bottle;
     const buildTestBottle = testBottleBuilderFactory();
 
-    describe("when HEAD call returns", () => {
+    describe('when get call returns', () => {
         let success;
+        const bankData = { some: 'info' };
 
         before(() => {
-            ({bottle, success} = buildTestBottle({
+            ({ bottle, success } = buildTestBottle({
                 [BOTTLE_NAMES.CLIENT_AWS]: {
-                    s3HeadObject: simple.stub().resolveWith("does not matter")
+                    s3GetObject: simple.stub().resolveWith({ Body: JSON.stringify(bankData) })
                 }
             }));
         });
 
-        it("should succeed with exists true", async () => {
+        it('should succeed with exists true', async () => {
             const response = await handlerPromise(defaultEvent, defaultContext, bottle.container);
-            expect(response).to.deep.equal(success({exists:true}));
+            expect(response).to.deep.equal(success({ bankData }));
         });
     });
 
-    describe("when HEAD call fails with code 'NotFound'", () => {
+    describe('when get call fails with code "NotFound"', () => {
         let success;
 
         before(() => {
-            ({bottle, success} = buildTestBottle({
+            ({ bottle, success } = buildTestBottle({
                 [BOTTLE_NAMES.CLIENT_AWS]: {
-                    s3HeadObject: simple.stub().rejectWith({code: "NotFound"})
+                    s3GetObject: simple.stub().rejectWith({ code: 'NoSuchKey' })
                 }
             }));
 
             success = bottle.container[BOTTLE_NAMES.LIB_RESPONSE].success;
         });
 
-        it("should succeed with exists false", async () => {
+        it('should succeed with exists false', async () => {
             const response = await handlerPromise(defaultEvent, defaultContext, bottle.container);
-            expect(response).to.deep.equal(success({exists:false}));
+            expect(response).to.deep.equal(success({ bankData: null }));
         });
     });
 
-    describe("when HEAD call fails with unknown code", () => {
+    describe('when get call fails with unknown code', () => {
         let failure;
 
         before(() => {
-            ({bottle, failure} = buildTestBottle({
+            ({ bottle, failure } = buildTestBottle({
                 [BOTTLE_NAMES.CLIENT_AWS]: {
-                    s3HeadObject: simple.stub().rejectWith({code: "Some Random Code"})
+                    s3GetObject: simple.stub().rejectWith({ code: 'Some Random Code' })
                 }
             }));
 
             failure = bottle.container[BOTTLE_NAMES.LIB_RESPONSE].failure;
         });
 
-        it("should fail with the expected message", async () => {
+        it('should fail with the expected message', async () => {
             const response = await handlerPromise(defaultEvent, defaultContext, bottle.container);
-            expect(response).to.deep.equal(failure({error:CONSTANTS.FAILURE_MESSAGE}));
+            expect(response).to.deep.equal(failure({ error:CONSTANTS.FAILURE_MESSAGE }));
         });
     });
 });
