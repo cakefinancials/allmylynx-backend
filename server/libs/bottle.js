@@ -4,6 +4,7 @@
 import Bottle from 'bottlejs';
 
 /* all of the node module dependencies */
+import axios from 'axios';
 import AWS from 'aws-sdk';
 const NestedError = require('nested-error-stacks');
 import plaid from 'plaid';
@@ -32,12 +33,14 @@ import { BOTTLE_FACTORY as userStateBagServiceBF } from '../services/user_state_
 
 import { BOTTLE_FACTORY as getUserStateBagBF } from '../functions/get_user_state_bag';
 import { BOTTLE_FACTORY as getUserDashboardDataBF } from '../functions/get_user_dashboard_data';
+import { BOTTLE_FACTORY as proxyZapierPost } from '../functions/proxy_zapier_post';
 import { BOTTLE_FACTORY as saveUserPlaidDataBF } from '../functions/save_user_plaid_data';
 import { BOTTLE_FACTORY as saveUserStateBagBF } from '../functions/save_user_state_bag';
 
 export const BOTTLE_NAMES = {
     NATIVE_ASSERT: 'native|assert',
 
+    EXTERN_AXIOS: 'node_modules|axios',
     EXTERN_AWS_SDK: 'node_modules|aws-sdk',
     EXTERN_BLUEBIRD: 'node_modules|bluebird',
     EXTERN_NESTED_ERROR: 'node_modules|nested-error-stacks',
@@ -63,6 +66,7 @@ export const BOTTLE_NAMES = {
 
     FUNCTION_GET_USER_STATE_BAG: 'function|get_user_state_bag',
     FUNCTION_GET_USER_DASHBOARD_DATA: 'function|get_user_dashboard_data',
+    FUNCTION_PROXY_ZAPIER_POST: 'function|proxy_zapier_post',
     FUNCTION_SAVE_USER_PLAID_DATA: 'function|save_user_plaid_data',
     FUNCTION_SAVE_USER_STATE_BAG: 'function|save_user_state_bag',
 };
@@ -98,6 +102,7 @@ function buildBottle(overrides = {}) {
         BOTTLE_NAMES: () => BOTTLE_NAMES,
         [BOTTLE_NAMES.NATIVE_ASSERT]: () => require('assert'),
 
+        [BOTTLE_NAMES.EXTERN_AXIOS]: () => axios,
         [BOTTLE_NAMES.EXTERN_AWS_SDK]: () => AWS,
         [BOTTLE_NAMES.EXTERN_BLUEBIRD]: () => Promise,
         [BOTTLE_NAMES.EXTERN_NESTED_ERROR]: () => NestedError,
@@ -133,6 +138,7 @@ function buildBottle(overrides = {}) {
 
         [BOTTLE_NAMES.FUNCTION_GET_USER_STATE_BAG]: getUserStateBagBF,
         [BOTTLE_NAMES.FUNCTION_GET_USER_DASHBOARD_DATA]: getUserDashboardDataBF,
+        [BOTTLE_NAMES.FUNCTION_PROXY_ZAPIER_POST]: proxyZapierPost,
         [BOTTLE_NAMES.FUNCTION_SAVE_USER_PLAID_DATA]: saveUserPlaidDataBF,
         [BOTTLE_NAMES.FUNCTION_SAVE_USER_STATE_BAG]: saveUserStateBagBF,
     }, DEFAULT_BOTTLE_OVERRIDES, overrides ]);

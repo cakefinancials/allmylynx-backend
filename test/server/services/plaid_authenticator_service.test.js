@@ -59,16 +59,11 @@ describe('plaid_authenticator_service_test', () => {
                 expect(mockExternPlaid.exchangePublicToken.lastCall.args).to.deep.equal([
                     plaidPublicToken
                 ]);
-
-                expect(mockExternPlaid.createStripeToken.lastCall.args).to.deep.equal([
-                    access_token,
-                    plaidAccountId
-                ]);
             });
         });
     });
 
-    describe.only('getPlaidInstitutionName', () => {
+    describe('getPlaidInstitutionName', () => {
         const plaidAccessToken = 'some_access_token';
 
         describe('when one of the plaid calls fail', () => {

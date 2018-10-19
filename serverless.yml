@@ -54,6 +54,15 @@ provider:
       Resource: "arn:aws:cognito-idp:us-east-2:951721516169:userpool/us-east-2_9v5RltuvI"
 
 functions:
+  proxy_zapier_post:
+    handler: server/functions/entry_points.proxy_zapier_post
+    warmup: ${self:custom.warmup_enabled.${self:custom.myStage}}
+    events:
+      - http:
+          path: proxy/zapier
+          method: post
+          cors: true
+
   save_user_email_identity_link:
     handler: server/functions/save_user_email_identity_link.main
     warmup: ${self:custom.warmup_enabled.${self:custom.myStage}}
