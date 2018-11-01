@@ -1,9 +1,9 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 chai.use(chaiAsPromised);
-import R from "ramda";
+import R from 'ramda';
 
-import { setDefaultBottleOverrides, BOTTLE_NAMES } from "../server/libs/bottle";
+import { setDefaultBottleOverrides, BOTTLE_NAMES } from '../server/libs/bottle';
 
 const testPublicKey = `
 -----BEGIN PGP PUBLIC KEY BLOCK-----
@@ -26,42 +26,37 @@ edrNlfZx0U2uVhaU7DThvSDCAq7nmFHuFGAigO6uM+b8QPB4M0zxrcvKtWO4jwvU
 `;
 
 export const TEST_ENV_VARS = {
-    AWS_SDK_REGION: "us-east-2",
-    CAKE_USER_POOL_ID: "SOME_FAKE_USER_POOL_ID",
-    USER_DATA_BUCKET: "SOME_FAKE_BUCKET",
-    USER_DATA_PUBLIC_KEY: testPublicKey,
+  AWS_SDK_REGION: 'us-east-2',
+  CAKE_USER_POOL_ID: 'SOME_FAKE_USER_POOL_ID',
+  USER_DATA_BUCKET: 'SOME_FAKE_BUCKET',
+  USER_DATA_PUBLIC_KEY: testPublicKey,
 };
 
 setDefaultBottleOverrides({
-    [BOTTLE_NAMES.CLIENT_ENV]: () => ({
-        getEnvVar: (name) => {
-            const envVar = R.path([name], TEST_ENV_VARS);
+  [BOTTLE_NAMES.CLIENT_ENV]: () => ({
+    getEnvVar: name => {
+      const envVar = R.path([name], TEST_ENV_VARS);
 
-            return envVar;
-        }
-    }),
-    [BOTTLE_NAMES.EXTERN_ROLLBAR]: () => {
-        return function TestRollbar(config) {
-            const rollbarFns = [
-                "log",
-                "debug",
-                "info",
-                "warning",
-                "error",
-                "critical",
-            ];
+      return envVar;
+    },
+  }),
+  [BOTTLE_NAMES.EXTERN_ROLLBAR]: () => {
+    return function TestRollbar(config) {
+      const rollbarFns = ['log', 'debug', 'info', 'warning', 'error', 'critical'];
 
-            R.forEach((fnName) => {
-                this[fnName] = () => {}
-            }, rollbarFns);
+      R.forEach(fnName => {
+        this[fnName] = () => {};
+      }, rollbarFns);
 
-            this.lambdaHandler = (fn) => {
-                return fn;
-            }
+      this.lambdaHandler = fn => {
+        return fn;
+      };
 
-            this.configure = () => { return this; }
-        }
+      this.configure = () => {
+        return this;
+      };
+    };
 
-        return TestRollbar;
-    }
+    return TestRollbar;
+  },
 });

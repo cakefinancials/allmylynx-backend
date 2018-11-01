@@ -1,51 +1,48 @@
 export function BOTTLE_FACTORY(container) {
-    const BOTTLE_NAMES = container.BOTTLE_NAMES;
+  const BOTTLE_NAMES = container.BOTTLE_NAMES;
 
-    const awsLib = container[BOTTLE_NAMES.CLIENT_AWS];
-    const envLib = container[BOTTLE_NAMES.CLIENT_ENV];
-    const logger = container[BOTTLE_NAMES.LIB_LOGGER]
-        .getContextualLogger('service.user_dashboard_data_service');
-    const s3KeyGeneratorService = container[BOTTLE_NAMES.SERVICE_S3_KEY_GENERATOR];
+  const awsLib = container[BOTTLE_NAMES.CLIENT_AWS];
+  const envLib = container[BOTTLE_NAMES.CLIENT_ENV];
+  const logger = container[BOTTLE_NAMES.LIB_LOGGER].getContextualLogger('service.user_dashboard_data_service');
+  const s3KeyGeneratorService = container[BOTTLE_NAMES.SERVICE_S3_KEY_GENERATOR];
 
-    const CONSTANTS = {
-        DASHBOARD_DATA_UNAVAILABLE: { dashboardData: null },
-        READ_USER_DASHBOARD_DATA_ERROR: 'ReadUserDashboardDataError',
-        READ_USER_DASHBOARD_DATA_ERROR_MESSAGE: 'Error while trying to read the user\'s dashboard data',
-    };
+  const CONSTANTS = {
+    DASHBOARD_DATA_UNAVAILABLE: { dashboardData: null },
+    READ_USER_DASHBOARD_DATA_ERROR: 'ReadUserDashboardDataError',
+    READ_USER_DASHBOARD_DATA_ERROR_MESSAGE: "Error while trying to read the user's dashboard data",
+  };
 
-    const SERVICE = {
-        CONSTANTS,
+  const SERVICE = {
+    CONSTANTS,
 
-        getUserDashboardData: async (userEmail) => {
-            const userDashboardDataKey = s3KeyGeneratorService.getUserDashboardDataKey(userEmail);
-            const userDashboardDataBucket = envLib.getEnvVar('USER_DASHBOARD_DATA_BUCKET');
-            const userDashboardDataBucketRegion = envLib.getEnvVar('USER_DASHBOARD_DATA_BUCKET_REGION');
+    getUserDashboardData: async userEmail => {
+      const userDashboardDataKey = s3KeyGeneratorService.getUserDashboardDataKey(userEmail);
+      const userDashboardDataBucket = envLib.getEnvVar('USER_DASHBOARD_DATA_BUCKET');
+      const userDashboardDataBucketRegion = envLib.getEnvVar('USER_DASHBOARD_DATA_BUCKET_REGION');
 
-            let responseBody;
-            try {
-                const response = await awsLib.s3GetObject(
-                    userDashboardDataBucket,
-                    userDashboardDataKey,
-                    { region: userDashboardDataBucketRegion }
-                );
+      let responseBody;
+      try {
+        const response = await awsLib.s3GetObject(userDashboardDataBucket, userDashboardDataKey, {
+          region: userDashboardDataBucketRegion,
+        });
 
-                responseBody = new String(response.Body);
-                const userDashboardData = JSON.parse(responseBody);
-                return { dashboardData: userDashboardData };
-            } catch (error) {
-                if (error.code === 'NoSuchKey') {
-                    return CONSTANTS.DASHBOARD_DATA_UNAVAILABLE;
-                }
+        responseBody = new String(response.Body);
+        const userDashboardData = JSON.parse(responseBody);
+        return { dashboardData: userDashboardData };
+      } catch (error) {
+        if (error.code === 'NoSuchKey') {
+          return CONSTANTS.DASHBOARD_DATA_UNAVAILABLE;
+        }
 
-                throw logger.createAndLogWrappedError(
-                    CONSTANTS.READ_USER_DASHBOARD_DATA_ERROR,
-                    CONSTANTS.READ_USER_DASHBOARD_DATA_ERROR_MESSAGE,
-                    error,
-                    { userEmail, responseBody }
-                );
-            }
-        },
-    };
+        throw logger.createAndLogWrappedError(
+          CONSTANTS.READ_USER_DASHBOARD_DATA_ERROR,
+          CONSTANTS.READ_USER_DASHBOARD_DATA_ERROR_MESSAGE,
+          error,
+          { userEmail, responseBody }
+        );
+      }
+    },
+  };
 
-    return SERVICE;
+  return SERVICE;
 }

@@ -1,92 +1,91 @@
-import { expect } from "chai";
-import simple from "simple-mock";
-import Promise from "bluebird";
-import R from "ramda";
+import { expect } from 'chai';
+import simple from 'simple-mock';
+import Promise from 'bluebird';
+import R from 'ramda';
 
-import { handler, CONSTANTS } from "../../../server/functions/save_brokerage_credentials";
-import { getDefaultEvent, getDefaultContext } from "../../helpers/defaults";
-import { TEST_ENV_VARS } from "../../init";
+import { handler, CONSTANTS } from '../../../server/functions/save_brokerage_credentials';
+import { getDefaultEvent, getDefaultContext } from '../../helpers/defaults';
+import { TEST_ENV_VARS } from '../../init';
 
-import { BOTTLE_NAMES, testBottleBuilderFactory } from "../../../server/libs/bottle";
+import { BOTTLE_NAMES, testBottleBuilderFactory } from '../../../server/libs/bottle';
 
-describe("save_brokerage_credentials", () => {
-    const handlerPromise = Promise.promisify(handler);
-    const [username, password, brokerage] = ["un", "pass", "brok"];
-    const defaultEvent = getDefaultEvent({body: {username, password, brokerage}});
-    const defaultContext = getDefaultContext();
+describe('save_brokerage_credentials', () => {
+  const handlerPromise = Promise.promisify(handler);
+  const [username, password, brokerage] = ['un', 'pass', 'brok'];
+  const defaultEvent = getDefaultEvent({ body: { username, password, brokerage } });
+  const defaultContext = getDefaultContext();
 
-    const successResolveText = "does not matter";
+  const successResolveText = 'does not matter';
 
-    const buildTestBottle = testBottleBuilderFactory({
-        [BOTTLE_NAMES.CLIENT_AWS]: {
-            s3PutObject: simple.stub().resolveWith(successResolveText)
-        },
+  const buildTestBottle = testBottleBuilderFactory({
+    [BOTTLE_NAMES.CLIENT_AWS]: {
+      s3PutObject: simple.stub().resolveWith(successResolveText),
+    },
+    [BOTTLE_NAMES.CLIENT_PGP]: {
+      encryptText: simple.stub().resolveWith(successResolveText),
+    },
+  });
+
+  describe('when pgp encrypt call fails', () => {
+    let bottle, failure;
+
+    before(() => {
+      ({ bottle, failure } = buildTestBottle({
         [BOTTLE_NAMES.CLIENT_PGP]: {
-            encryptText: simple.stub().resolveWith(successResolveText)
-        }
+          encryptText: simple.stub().rejectWith('some error'),
+        },
+      }));
     });
 
-    describe("when pgp encrypt call fails", () => {
-        let bottle, failure;
+    it('should fail with the correct error message', async () => {
+      const response = await handlerPromise(defaultEvent, defaultContext, bottle.container);
+      expect(response).to.deep.equal(failure({ error: CONSTANTS.ENCRYPTING_DATA_FAILURE_MESSAGE }));
+    });
+  });
 
-        before(() => {
-            ({bottle, failure} = buildTestBottle({
-                [BOTTLE_NAMES.CLIENT_PGP]: {
-                    encryptText: simple.stub().rejectWith("some error")
-                }
-            }));
-        });
+  describe('when s3PutObject fails', () => {
+    let bottle, failure;
 
-        it("should fail with the correct error message", async () => {
-            const response = await handlerPromise(defaultEvent, defaultContext, bottle.container);
-            expect(response).to.deep.equal(failure({error: CONSTANTS.ENCRYPTING_DATA_FAILURE_MESSAGE}));
-        });
+    before(() => {
+      ({ bottle, failure } = buildTestBottle({
+        [BOTTLE_NAMES.CLIENT_AWS]: {
+          s3PutObject: simple.stub().rejectWith('some error'),
+        },
+      }));
     });
 
-    describe("when s3PutObject fails", () => {
-        let bottle, failure;
+    it('should fail with the correct error message', async () => {
+      const response = await handlerPromise(defaultEvent, defaultContext, bottle.container);
+      expect(response).to.deep.equal(failure({ error: CONSTANTS.S3_UPLOAD_FAILURE_MESSAGE }));
+    });
+  });
 
-        before(() => {
-            ({bottle, failure} = buildTestBottle({
-                [BOTTLE_NAMES.CLIENT_AWS]: {
-                    s3PutObject: simple.stub().rejectWith("some error")
-                }
-            }));
-        });
+  describe('when all calls succeed', () => {
+    let bottle, success;
 
-        it("should fail with the correct error message", async () => {
-            const response = await handlerPromise(defaultEvent, defaultContext, bottle.container);
-            expect(response).to.deep.equal(failure({error: CONSTANTS.S3_UPLOAD_FAILURE_MESSAGE}));
-        });
+    before(() => {
+      ({ bottle, success } = buildTestBottle());
     });
 
-    describe("when all calls succeed", () => {
-        let bottle, success;
+    it('should respond with success', async () => {
+      const response = await handlerPromise(defaultEvent, defaultContext, bottle.container);
+      expect(response).to.deep.equal(success({ success: true }));
 
-        before(() => {
-            ({bottle, success} = buildTestBottle());
-        });
+      const [encryptedUpload, obfuscatedUpload] = bottle.container[BOTTLE_NAMES.CLIENT_AWS].s3PutObject.calls;
 
-        it("should respond with success", async () => {
-            const response = await handlerPromise(defaultEvent, defaultContext, bottle.container);
-            expect(response).to.deep.equal(success({success: true}));
+      const USER_DATA_BUCKET = TEST_ENV_VARS.USER_DATA_BUCKET;
 
-            const [encryptedUpload, obfuscatedUpload] =
-                bottle.container[BOTTLE_NAMES.CLIENT_AWS].s3PutObject.calls;
+      expect(encryptedUpload.args).to.deep.equal([
+        USER_DATA_BUCKET,
+        `${defaultEvent.requestContext.identity.cognitoIdentityId}/brokerage_credentials`,
+        successResolveText,
+      ]);
 
-            const USER_DATA_BUCKET = TEST_ENV_VARS.USER_DATA_BUCKET;
-
-            expect(encryptedUpload.args).to.deep.equal([
-                USER_DATA_BUCKET,
-                `${defaultEvent.requestContext.identity.cognitoIdentityId}/brokerage_credentials`,
-                successResolveText
-            ]);
-
-            expect(obfuscatedUpload.args).to.deep.equal([
-                USER_DATA_BUCKET,
-                `${defaultEvent.requestContext.identity.cognitoIdentityId}/obfuscated_brokerage_credentials.json`,
-                `{"username":"${username}","brokerage":"${brokerage}"}`
-            ]);
-        });
+      expect(obfuscatedUpload.args).to.deep.equal([
+        USER_DATA_BUCKET,
+        `${defaultEvent.requestContext.identity.cognitoIdentityId}/obfuscated_brokerage_credentials.json`,
+        `{"username":"${username}","brokerage":"${brokerage}"}`,
+      ]);
     });
+  });
 });

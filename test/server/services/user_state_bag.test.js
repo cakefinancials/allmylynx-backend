@@ -1,169 +1,163 @@
-import { expect } from "chai";
-import simple from "simple-mock";
+import { expect } from 'chai';
+import simple from 'simple-mock';
 
-import { BOTTLE_NAMES, testBottleBuilderFactory } from "../../../server/libs/bottle";
-import { TEST_ENV_VARS } from "../../init";
+import { BOTTLE_NAMES, testBottleBuilderFactory } from '../../../server/libs/bottle';
+import { TEST_ENV_VARS } from '../../init';
 const buildTestBottle = testBottleBuilderFactory();
 
-describe("user_state_bag", () => {
-    const testUserId = "someUser123";
-    const testUserState = { some: "body" };
+describe('user_state_bag', () => {
+  const testUserId = 'someUser123';
+  const testUserState = { some: 'body' };
 
-    let awsClient;
-    let s3KeyGeneratorService;
-    let userStateBagService;
+  let awsClient;
+  let s3KeyGeneratorService;
+  let userStateBagService;
 
-    const buildUserStateBagTestBottle = (overrides) => {
-        const {bottle} = buildTestBottle(overrides);
-        awsClient = bottle.container[BOTTLE_NAMES.CLIENT_AWS];
-        s3KeyGeneratorService = bottle.container[BOTTLE_NAMES.SERVICE_S3_KEY_GENERATOR];
-        userStateBagService = bottle.container[BOTTLE_NAMES.SERVICE_USER_STATE_BAG];
-    };
+  const buildUserStateBagTestBottle = overrides => {
+    const { bottle } = buildTestBottle(overrides);
+    awsClient = bottle.container[BOTTLE_NAMES.CLIENT_AWS];
+    s3KeyGeneratorService = bottle.container[BOTTLE_NAMES.SERVICE_S3_KEY_GENERATOR];
+    userStateBagService = bottle.container[BOTTLE_NAMES.SERVICE_USER_STATE_BAG];
+  };
 
-    describe("verifyPreviousStateEqualsCurrentState", () => {
-        describe("when the states are equal", () => {
-            before(() => {
-                buildUserStateBagTestBottle();
-            });
+  describe('verifyPreviousStateEqualsCurrentState', () => {
+    describe('when the states are equal', () => {
+      before(() => {
+        buildUserStateBagTestBottle();
+      });
 
-            it("should have no side effects", () => {
-                const previousState = { some: 'state' };
-                const currentState = { some: 'state' };
-                expect(
-                    () => userStateBagService.verifyPreviousStateEqualsCurrentState(
-                        previousState,
-                        currentState
-                    )
-                ).to.not.throw();
-            });
-        });
-
-        describe("when the states are not equal", () => {
-            before(() => {
-                buildUserStateBagTestBottle();
-            });
-
-            it("should throw", () => {
-                const previousState = { some: 'state' };
-                const currentState = { some: 'state', oh: 'no' };
-
-                expect(
-                    () => userStateBagService.verifyPreviousStateEqualsCurrentState(
-                        previousState,
-                        currentState
-                    )
-                ).to.throw(userStateBagService.CONSTANTS.VERIFY_PREVIOUS_EQUALS_CURRENT_FAILURE_MESSAGE);
-            });
-        });
+      it('should have no side effects', () => {
+        const previousState = { some: 'state' };
+        const currentState = { some: 'state' };
+        expect(() =>
+          userStateBagService.verifyPreviousStateEqualsCurrentState(previousState, currentState)
+        ).to.not.throw();
+      });
     });
 
-    describe("writeUserState", () => {
-        describe("when the save succeeds", () => {
-            before(() => {
-                buildUserStateBagTestBottle({
-                    [BOTTLE_NAMES.CLIENT_AWS]: {
-                        s3PutObject: simple.stub().resolveWith('success')
-                    }
-                });
-            });
+    describe('when the states are not equal', () => {
+      before(() => {
+        buildUserStateBagTestBottle();
+      });
 
-            it("should return success true", async () => {
-                const result = await userStateBagService.writeUserState(testUserId, testUserState);
-                expect(result).to.deep.equal({success: true});
+      it('should throw', () => {
+        const previousState = { some: 'state' };
+        const currentState = { some: 'state', oh: 'no' };
 
-                const s3PutObjectStub = awsClient.s3PutObject;
-                expect(s3PutObjectStub.callCount).to.equal(1);
-                expect(s3PutObjectStub.lastCall.args).to.deep.equal([
-                    TEST_ENV_VARS.USER_DATA_BUCKET,
-                    s3KeyGeneratorService.getUserStateBagKey(testUserId),
-                    JSON.stringify(testUserState)
-                ]);
-            });
+        expect(() => userStateBagService.verifyPreviousStateEqualsCurrentState(previousState, currentState)).to.throw(
+          userStateBagService.CONSTANTS.VERIFY_PREVIOUS_EQUALS_CURRENT_FAILURE_MESSAGE
+        );
+      });
+    });
+  });
+
+  describe('writeUserState', () => {
+    describe('when the save succeeds', () => {
+      before(() => {
+        buildUserStateBagTestBottle({
+          [BOTTLE_NAMES.CLIENT_AWS]: {
+            s3PutObject: simple.stub().resolveWith('success'),
+          },
         });
+      });
 
-        describe("when the save fails", () => {
-            const rejectErr = new Error("S3 PUT FAILURE");
+      it('should return success true', async () => {
+        const result = await userStateBagService.writeUserState(testUserId, testUserState);
+        expect(result).to.deep.equal({ success: true });
 
-            before(() => {
-                buildUserStateBagTestBottle({
-                    [BOTTLE_NAMES.CLIENT_AWS]: {
-                        s3PutObject: simple.stub().rejectWith(rejectErr)
-                    }
-                });
-            });
-
-            it("should throw the error", async () => {
-                const promiseToTest = userStateBagService.writeUserState(testUserId, testUserState);
-                const thrownErr = await promiseToTest.catch(e => e);
-                expect(thrownErr.nested).to.equal(rejectErr);
-                expect(thrownErr.message).to.equal(userStateBagService.CONSTANTS.WRITE_USER_STATE_FAILURE_MESSAGE);
-            });
-        });
+        const s3PutObjectStub = awsClient.s3PutObject;
+        expect(s3PutObjectStub.callCount).to.equal(1);
+        expect(s3PutObjectStub.lastCall.args).to.deep.equal([
+          TEST_ENV_VARS.USER_DATA_BUCKET,
+          s3KeyGeneratorService.getUserStateBagKey(testUserId),
+          JSON.stringify(testUserState),
+        ]);
+      });
     });
 
-    describe("readUserState", () => {
-        const testUserId = "someUser123";
-        const testUserStateBag = {some: "bag"};
+    describe('when the save fails', () => {
+      const rejectErr = new Error('S3 PUT FAILURE');
 
-        describe("when the read succeeds", () => {
-            before(() => {
-                buildUserStateBagTestBottle({
-                    [BOTTLE_NAMES.CLIENT_AWS]: {
-                        s3GetObject: simple.stub().resolveWith({
-                            Body: JSON.stringify(testUserStateBag)
-                        })
-                    }
-                });
-            });
-
-            it("should return the user state bag", async () => {
-                const result = await userStateBagService.readUserState(testUserId);
-                expect(result).to.deep.equal(testUserStateBag);
-
-                const s3GetObjectStub = awsClient.s3GetObject;
-                expect(s3GetObjectStub.callCount).to.equal(1);
-                expect(s3GetObjectStub.lastCall.args).to.deep.equal([
-                    TEST_ENV_VARS.USER_DATA_BUCKET,
-                    s3KeyGeneratorService.getUserStateBagKey(testUserId)
-                ]);
-            });
+      before(() => {
+        buildUserStateBagTestBottle({
+          [BOTTLE_NAMES.CLIENT_AWS]: {
+            s3PutObject: simple.stub().rejectWith(rejectErr),
+          },
         });
+      });
 
-        describe("when the read fails for an unknown reason", () => {
-            const rejectErr = new Error("S3 GET FAILURE");
-
-            before(() => {
-                buildUserStateBagTestBottle({
-                    [BOTTLE_NAMES.CLIENT_AWS]: {
-                        s3GetObject: simple.stub().rejectWith(rejectErr)
-                    }
-                });
-            });
-
-            it("should throw the error", async () => {
-                const promiseToTest = userStateBagService.readUserState(testUserId);
-                const thrownErr = await promiseToTest.catch(e => e);
-                expect(thrownErr.nested).to.equal(rejectErr);
-                expect(thrownErr.message).to.equal(userStateBagService.CONSTANTS.READ_USER_STATE_FAILURE_MESSAGE);
-            });
-        });
-
-        describe("when the read fails because the key is not found", () => {
-            const rejectErr = new Error("S3 GET FAILURE");
-            rejectErr.code = "NoSuchKey";
-
-            before(() => {
-                buildUserStateBagTestBottle({
-                    [BOTTLE_NAMES.CLIENT_AWS]: {
-                        s3GetObject: simple.stub().rejectWith(rejectErr)
-                    }
-                });
-            });
-
-            it("should return an empty object", async () => {
-                const result = await userStateBagService.readUserState(testUserId);
-                expect(result).to.deep.equal({});
-            });
-        });
+      it('should throw the error', async () => {
+        const promiseToTest = userStateBagService.writeUserState(testUserId, testUserState);
+        const thrownErr = await promiseToTest.catch(e => e);
+        expect(thrownErr.nested).to.equal(rejectErr);
+        expect(thrownErr.message).to.equal(userStateBagService.CONSTANTS.WRITE_USER_STATE_FAILURE_MESSAGE);
+      });
     });
+  });
+
+  describe('readUserState', () => {
+    const testUserId = 'someUser123';
+    const testUserStateBag = { some: 'bag' };
+
+    describe('when the read succeeds', () => {
+      before(() => {
+        buildUserStateBagTestBottle({
+          [BOTTLE_NAMES.CLIENT_AWS]: {
+            s3GetObject: simple.stub().resolveWith({
+              Body: JSON.stringify(testUserStateBag),
+            }),
+          },
+        });
+      });
+
+      it('should return the user state bag', async () => {
+        const result = await userStateBagService.readUserState(testUserId);
+        expect(result).to.deep.equal(testUserStateBag);
+
+        const s3GetObjectStub = awsClient.s3GetObject;
+        expect(s3GetObjectStub.callCount).to.equal(1);
+        expect(s3GetObjectStub.lastCall.args).to.deep.equal([
+          TEST_ENV_VARS.USER_DATA_BUCKET,
+          s3KeyGeneratorService.getUserStateBagKey(testUserId),
+        ]);
+      });
+    });
+
+    describe('when the read fails for an unknown reason', () => {
+      const rejectErr = new Error('S3 GET FAILURE');
+
+      before(() => {
+        buildUserStateBagTestBottle({
+          [BOTTLE_NAMES.CLIENT_AWS]: {
+            s3GetObject: simple.stub().rejectWith(rejectErr),
+          },
+        });
+      });
+
+      it('should throw the error', async () => {
+        const promiseToTest = userStateBagService.readUserState(testUserId);
+        const thrownErr = await promiseToTest.catch(e => e);
+        expect(thrownErr.nested).to.equal(rejectErr);
+        expect(thrownErr.message).to.equal(userStateBagService.CONSTANTS.READ_USER_STATE_FAILURE_MESSAGE);
+      });
+    });
+
+    describe('when the read fails because the key is not found', () => {
+      const rejectErr = new Error('S3 GET FAILURE');
+      rejectErr.code = 'NoSuchKey';
+
+      before(() => {
+        buildUserStateBagTestBottle({
+          [BOTTLE_NAMES.CLIENT_AWS]: {
+            s3GetObject: simple.stub().rejectWith(rejectErr),
+          },
+        });
+      });
+
+      it('should return an empty object', async () => {
+        const result = await userStateBagService.readUserState(testUserId);
+        expect(result).to.deep.equal({});
+      });
+    });
+  });
 });
